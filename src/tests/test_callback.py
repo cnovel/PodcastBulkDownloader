@@ -1,9 +1,11 @@
+from os import environ
 from tkinter.ttk import Progressbar
 from .. import callback
 
 
 def test_callback_pb():
-    pb = Progressbar()
+    # Trick for Travis-CI under Linux
+    pb = Progressbar() if environ.get('DISPLAY', '') != '' else None
     cb = callback.Callback(pb)
     cb.progress(1)
     assert cb._progress == 1
