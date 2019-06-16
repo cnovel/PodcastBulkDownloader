@@ -1,14 +1,64 @@
 from bs4 import BeautifulSoup
 import requests
 import os.path
-import urllib
 import logging
 import argparse
+from time import sleep
 from xml.etree import ElementTree
 
 
 class BulkDownloaderException(Exception):
     pass
+
+
+def download_with_resume(url, path):
+    logging.debug("Downloading {} to {}".format(url, path))
+
+    # Clean existing file
+    if os.path.exists(path):
+        os.remove(path)
+
+    try:
+        r = requests.head(url)
+    except requests.exceptions as e:
+        logging.error(e)
+        return False
+
+    if r.status_code < 200 or r.status_code > 302:
+        logging.error("Failed to reach {}, status is {}".format(url, r.status_code))
+        r.close()
+        return False
+
+    expected_size = int(r.headers.get("content-length"))
+    r.close()
+
+    chunk_size = 2**20
+    last_byte = 0
+    with open(path, 'wb') as f:
+        while last_byte < expected_size:
+            logging.debug("{} vs {}".format(last_byte, expected_size))
+            logging.debug("Starting download with already {}% of the file".
+                          format((100*last_byte)/expected_size))
+            resume_header = {'Range': 'bytes=%d-' % last_byte}
+            resume_request = requests.get(url, headers=resume_header, stream=True,
+                                          verify=True, allow_redirects=True)
+            for data in resume_request.iter_content(chunk_size):
+                f.write(data)
+                last_byte += len(data)
+            resume_request.close()
+
+    return True
+
+
+def try_download(url, path, max_try=3, sleep_time=5):
+    count = 0
+    while count < max_try:
+        if download_with_resume(url, path):
+            return True
+        count += 1
+        sleep(sleep_time)
+    logging.error('Download of {} failed after {} tries'.format(url, max_try))
+    return False
 
 
 class BulkDownloader:
@@ -39,7 +89,7 @@ class BulkDownloader:
             to_download = self._get_url_to_download_from_html(page)
         return to_download
 
-    def download_mp3(self):
+    def download_mp3(self, dry_run=False):
         if not self.folder():
             raise BulkDownloaderException('No folder is defined for the download')
         to_download = self.list_mp3()
@@ -48,8 +98,9 @@ class BulkDownloader:
             name = os.path.basename(file)
             name = name.replace('%20', ' ')
             path = os.path.join(self.folder(), name)
-            logging.info('Saving {} to {}'.format(name, path))
-            urllib.request.urlretrieve(file, path)
+            logging.info('Saving {} to {} from {}'.format(name, path, file))
+            if not dry_run:
+                try_download(file, path)
             logging.info('Done')
 
     def _get_url_to_download_from_html(self, page):
@@ -93,6 +144,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     log_format = "[%(levelname)s] %(message)s"
     logging.basicConfig(format=log_format)
+    logging.captureWarnings(True)
     parser = argparse.ArgumentParser(description='Download MP3s from RSS feed or web folder')
     parser.add_argument('--url', dest='url', help='URL to inspect')
     parser.add_argument('-f', '--folder', dest='folder', help='Destination folder')
