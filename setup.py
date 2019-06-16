@@ -7,5 +7,5 @@ setup(name='Podcast Bulk Downloader',
       description='Simple software for downloading all the episodes of a podcast',
       author='Cyril Novel',
       author_email='podcast.bulk@kosmon.fr',
-      install_requires=['requests', 'bs4', 'pytest']
+      install_requires=['requests', 'bs4', 'pytest', 'pytest-cov']
      )
