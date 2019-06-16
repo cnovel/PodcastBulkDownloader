@@ -67,4 +67,3 @@ def test_try_download_ok(tmp_directory):
 def test_try_download_ko(tmp_directory):
     assert not bd.try_download('http://www.acute3d.com/embed/Logo-pix4d.png',
                                os.path.join(tmp_directory, 'pix4d.png'), 2, 1)
-

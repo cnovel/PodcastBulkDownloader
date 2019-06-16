@@ -37,7 +37,8 @@ def download_with_resume(url, path):
     with open(path, 'wb') as f:
         while last_byte < expected_size:
             logging.debug("{} vs {}".format(last_byte, expected_size))
-            logging.debug("Starting download with already {}% of the file".format((100*last_byte)/expected_size))
+            logging.debug("Starting download with already {}% of the file".
+                          format((100*last_byte)/expected_size))
             resume_header = {'Range': 'bytes=%d-' % last_byte}
             resume_request = requests.get(url, headers=resume_header, stream=True,
                                           verify=True, allow_redirects=True)
