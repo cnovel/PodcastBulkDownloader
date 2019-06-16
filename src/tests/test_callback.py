@@ -9,7 +9,8 @@ def test_callback_pb():
     cb = callback.Callback(pb)
     cb.progress(1)
     assert cb._progress == 1
-    assert cb._pb['value'] == 1
+    if cb._pb:
+        assert cb._pb['value'] == 1
 
 
 def test_callback_function():
