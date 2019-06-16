@@ -19,3 +19,5 @@ install:
 # command to run tests
 script:
   - pytest -v --cov=src
+  - pip install codecov
+  - codecov
