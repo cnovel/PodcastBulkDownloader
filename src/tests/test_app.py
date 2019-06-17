@@ -1,10 +1,13 @@
+from os import environ
 from tkinter import *
 from .. import app
 
 
 def test_app():
-    root = Tk()
-    a = app.PDBApp(root)
-    a.download()
-    a.fetch()
-    a.cancel()
+    # Can't test if no display
+    if environ.get('DISPLAY', '') != '':
+        root = Tk()
+        a = app.PDBApp(root)
+        a.download()
+        a.fetch()
+        a.cancel()
