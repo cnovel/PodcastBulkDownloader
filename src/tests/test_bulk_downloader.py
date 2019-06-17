@@ -2,6 +2,7 @@ import pytest
 import os
 from shutil import rmtree
 from .. import bulk_downloader as bd
+from src.callback import Callback
 
 
 def test_constructor():
@@ -18,7 +19,8 @@ def test_set_folder():
 
 def test_list_mp3():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
-    assert len(bdl.list_mp3()) > 0
+    cb = Callback()
+    assert len(bdl.list_mp3(cb, True)) > 0
 
 
 def test_wrong_feed():
@@ -43,7 +45,8 @@ def test_dl_no_folder():
 def test_dl_dry():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
     assert len(bdl.list_mp3()) > 0
-    bdl.download_mp3(dry_run=True)
+    cb = Callback()
+    bdl.download_mp3(dry_run=True, cb=cb)
 
 
 @pytest.fixture(scope='module')
@@ -60,8 +63,9 @@ def tmp_directory(request):
 
 
 def test_try_download_ok(tmp_directory):
+    cb = Callback()
     assert bd.try_download('http://www.acute3d.com/embed/Logo-acute3D.png',
-                           os.path.join(tmp_directory, 'acute3d.png'), 2, 1)
+                           os.path.join(tmp_directory, 'acute3d.png'), 2, 1, cb)
 
 
 def test_try_download_ko(tmp_directory):
