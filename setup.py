@@ -9,5 +9,5 @@ setup(name='Podcast Bulk Downloader',
       author_email='podcast.bulk@kosmon.fr',
       install_requires=['requests', 'bs4', 'pytest', 'pytest-cov'],
       packages=['src'],
-      scripts=['src/app.py', 'src/bulk_downloader.py', 'src/callback.py']
-     )
+      scripts=['src/bulk_downloader.py', 'src/callback.py']
+      )
