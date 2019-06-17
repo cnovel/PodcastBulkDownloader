@@ -25,7 +25,10 @@ class PDBApp(Frame):
         # master.geometry('500x800')
         style = ttk.Style()
         self._style = StringVar()
-        self._style.set('vista')
+        if 'vista' in style.theme_names():
+            self._style.set('vista')
+        else:
+            self._style.set('default')
         style.theme_use(self._style.get())
 
         # Layout configuration
