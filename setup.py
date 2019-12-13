@@ -2,8 +2,10 @@
 
 from setuptools import setup
 
+version = '0.1'
+
 setup(name='Podcast Bulk Downloader',
-      version='0.1',
+      version=version,
       description='Simple software for downloading all the episodes of a podcast',
       author='Cyril Novel',
       author_email='podcast.bulk@kosmon.fr',

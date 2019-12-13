@@ -6,6 +6,7 @@ import argparse
 from src.callback import Callback
 from time import sleep
 from xml.etree import ElementTree
+from setup import version
 
 
 class BulkDownloaderException(Exception):
@@ -185,6 +186,7 @@ def main():
     log_format = "[%(levelname)s] %(message)s"
     logging.basicConfig(format=log_format)
     logging.captureWarnings(True)
+    logging.info('Podcast Bulk Downloader v{}'.format(version))
     parser = argparse.ArgumentParser(description='Download MP3s from RSS feed or web folder')
     parser.add_argument('--url', dest='url', help='URL to inspect')
     parser.add_argument('-f', '--folder', dest='folder', help='Destination folder')
