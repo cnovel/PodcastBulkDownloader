@@ -1,4 +1,4 @@
-![PBD_Logo](src/pdb_logo_small.png)
+![PBD_Logo](img/pdb_logo_small.png)
 
 # Podcast Bulk Downloader
 [![Build Status](https://travis-ci.org/cnovel/PodcastBulkDownloader.svg?branch=master)](https://travis-ci.org/cnovel/PodcastBulkDownloader) [![codecov](https://codecov.io/gh/cnovel/PodcastBulkDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/cnovel/PodcastBulkDownloader)
@@ -7,20 +7,24 @@
 
 ## How to use Podcast Bulk Downloader
 ### CLI version
-Usage: `PodcastBulkDownloader.exe -f FOLDER --url RSS_URL [--overwrite]`
+Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite]`
 
 Arguments:
 * `-h`, `--help`: shows this help message and exit
 * `--url URL`: URL to inspect for MP3s
-* `-f FOLDER`, `--folder FOLDER`: Destination folder to MP3 files
+* `-f FOLDER`, `--folder FOLDER`: Destination folder for MP3 files
 * `--overwrite`: Will overwrite existing files
+* `version`: Print version
 
 Example:
 ```
-PodcastBulkDownloader.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://feeds.radiokawa.com/podcast_ta-gueule.xml
+PodcastBulkDownloaderCLI.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://feeds.radiokawa.com/podcast_ta-gueule.xml
 ```
 
 ### GUI Version
+![PBD_GUI](img/PBD_GUI.png)
+
+It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed. Then fill the Folder field and click download to download the episodes.
 
 ## How to build _PBD_
 ### Build and run tests
@@ -37,4 +41,4 @@ pytest -v
 ```
 
 ### Creating EXE file
-Execute `create_exe.bat`, it will create the exe file in a subdirectory called `dist`.
+Execute `create_exe.bat`, it will create the exe files in a subdirectory called `dist`.

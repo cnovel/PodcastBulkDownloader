@@ -276,10 +276,13 @@ def main() -> int:
     logging.basicConfig(format=log_format)
     logging.captureWarnings(True)
     parser = argparse.ArgumentParser(description='Download MP3s from RSS feed or web folder')
-    parser.add_argument('--url', dest='url', help='URL to inspect')
-    parser.add_argument('-f', '--folder', dest='folder', help='Destination folder')
-    parser.add_argument('--overwrite', dest='overwrite', action='store_true')
-    parser.add_argument('-v', '--version', dest='version', action='store_true')
+    parser.add_argument('--url', dest='url', help='URL to inspect for MP3s')
+    parser.add_argument('-f', '--folder', dest='folder',
+                        help='Destination folder for MP3 files')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Will overwrite existing files')
+    parser.add_argument('-v', '--version', dest='version', action='store_true',
+                        help='Print version')
     args = parser.parse_args()
 
     if args.version:
