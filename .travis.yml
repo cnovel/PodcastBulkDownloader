@@ -25,6 +25,7 @@ matrix:
         - choco install python --version 3.7.2
         - python --version
         - python -m pip install --upgrade pip
+        - pip3 install codecov
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 # command to install dependencies
 install:
