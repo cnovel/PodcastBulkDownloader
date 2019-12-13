@@ -10,8 +10,8 @@ from src.callback import Callback
 
 
 def show_message_box_on_exception(exc: Exception):
-    messagebox.showerror(title='An exception occured',
-                         message='An exception occured:\n{}'
+    messagebox.showerror(title='An exception occurred',
+                         message='An exception occurred:\n{}'
                                  '\n\nDetails:\n{}'
                                  '\n\nPlease report the issue on GitHub'.format(exc, exc.args))
 
