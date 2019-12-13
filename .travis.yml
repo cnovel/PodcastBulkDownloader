@@ -6,17 +6,25 @@ matrix:
       dist: xenial          # required for Python >= 3.7
       services:
         - xvfb
+      before_install:
+        - python --version
+        - pip install -U pip
+        - pip install codecov
     - name: "Python 3.7.2 on macOS"
       os: osx
       osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
       language: shell       # 'language: python' is an error on Travis CI macOS
+      before_install:
+        - python3 --version
+        - pip3 install -U pip
+        - pip3 install codecov
     - name: "Python 3.7.3 on Windows"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install:
-        - choco install python
+        - choco install python --version 3.7.2
         - python --version
-        - pip install -U pip
+        - python -m pip install --upgrade pip
       env: PATH=/c/Python37:/c/Python37/Scripts:$PATH
 # command to install dependencies
 install:
@@ -24,5 +32,4 @@ install:
 # command to run tests
 script:
   - pytest -v --cov=src
-  - pip install codecov
   - codecov
