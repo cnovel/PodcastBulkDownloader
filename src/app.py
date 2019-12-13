@@ -7,7 +7,7 @@ from tkinter import filedialog
 from threading import Thread
 from src.bulk_downloader import BulkDownloader
 from src.callback import Callback
-from setup import version
+from src import pbd_version
 
 
 def show_message_box_on_exception(exc: Exception):
@@ -22,7 +22,7 @@ def show_message_box_on_exception(exc: Exception):
 class PDBApp(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
-        master.title('Podcast Bulk Downloader v{}'.format(version))
+        master.title('Podcast Bulk Downloader v{}'.format(pbd_version))
         # master.geometry('500x800')
         style = ttk.Style()
         self._style = StringVar()
