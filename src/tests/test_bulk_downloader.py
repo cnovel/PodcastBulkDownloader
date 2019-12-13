@@ -87,3 +87,9 @@ def test_try_download_ok(tmp_directory):
 def test_try_download_ko(tmp_directory):
     assert not bd.try_download('http://www.acute3d.com/embed/Logo-pix4d.png',
                                os.path.join(tmp_directory, 'pix4d.png'), 2, 1)
+
+
+def test_dl_dry_files_exist(tmp_directory):
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', tmp_directory, False)
+    open("NAWAK1.mp3", "w")
+    bdl.download_mp3(None, True)
