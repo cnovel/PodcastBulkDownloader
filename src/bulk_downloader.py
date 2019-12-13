@@ -125,6 +125,7 @@ class BulkDownloader:
         if cb:
             cb.progress(0)
         count = 0
+        downloads_successful = 0
         step = 100. / len(to_download)
         for file in to_download:
             if cb:
@@ -136,12 +137,14 @@ class BulkDownloader:
             path = os.path.join(self.folder(), name)
             logging.info('Saving {} to {} from {}'.format(name, path, file))
             cb.set_function(lambda x: (count + x / 100) * step)
-            if not dry_run:
-                try_download(file, path, cb=cb)
+            if not dry_run and try_download(file, path, cb=cb):
+                downloads_successful += 1
             cb.set_function(lambda x: x)
             count += 1
         if cb:
             cb.progress(100)
+        logging.info('{}/{} episodes were successfully downloaded'.format(downloads_successful,
+                                                                          len(to_download)))
 
     def _get_url_to_download_from_html(self, page):
         soup = BeautifulSoup(page, 'html.parser')
