@@ -1,7 +1,7 @@
 language: python
 matrix:
   include:
-    - name: "Python 3.7.1 on Xenial Linux"
+    - name: "Xenial Linux - Python 3.7.1"
       python: 3.7           # this works for Linux but is ignored on macOS or Windows
       dist: xenial          # required for Python >= 3.7
       services:
@@ -10,7 +10,7 @@ matrix:
         - python --version
         - pip install -U pip
         - pip install codecov
-    - name: "Python 3.7.2 on macOS"
+    - name: "macOS - Python 3.7.2"
       os: osx
       osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
       language: shell       # 'language: python' is an error on Travis CI macOS
@@ -18,7 +18,7 @@ matrix:
         - python3 --version
         - pip3 install -U pip
         - pip3 install codecov
-    - name: "Python 3.7.3 on Windows"
+    - name: "Windows - Python 3.7.2"
       os: windows           # Windows 10.0.17134 N/A Build 17134
       language: shell       # 'language: python' is an error on Travis CI Windows
       before_install:
