@@ -1,0 +1,1 @@
+pyinstaller.exe -w -F -i src\pbd_icon.ico src\app.py -n PodcastBulkDownloader
