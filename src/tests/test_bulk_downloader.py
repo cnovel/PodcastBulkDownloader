@@ -6,15 +6,25 @@ from src.callback import Callback
 
 
 def test_constructor():
-    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', False)
     assert bdl._url == 'https://feeds.radiokawa.com/podcast_nawak.xml'
     assert bdl.folder() == './dl'
+    assert not bdl.overwrite()
 
 
 def test_set_folder():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
     bdl.folder('./dl2')
     assert bdl.folder() == './dl2'
+
+
+def test_set_overwrite():
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', False)
+    assert not bdl.overwrite()
+    bdl.overwrite(True)
+    assert bdl.overwrite()
+    bdl.overwrite(False)
+    assert not bdl.overwrite()
 
 
 def test_list_mp3():
@@ -49,6 +59,12 @@ def test_dl_dry():
     bdl.download_mp3(dry_run=True, cb=cb)
 
 
+def test_dl_dry_no_cb():
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
+    assert len(bdl.list_mp3()) > 0
+    bdl.download_mp3(dry_run=True)
+
+
 @pytest.fixture(scope='module')
 def tmp_directory(request):
     tmp_directory = os.path.join(os.getcwd(), 'tmp_dir')
@@ -71,3 +87,9 @@ def test_try_download_ok(tmp_directory):
 def test_try_download_ko(tmp_directory):
     assert not bd.try_download('http://www.acute3d.com/embed/Logo-pix4d.png',
                                os.path.join(tmp_directory, 'pix4d.png'), 2, 1)
+
+
+def test_dl_dry_files_exist(tmp_directory):
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', tmp_directory, False)
+    open(os.path.join(tmp_directory, "NAWAK1.mp3"), "w")
+    bdl.download_mp3(None, True)

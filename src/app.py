@@ -57,6 +57,10 @@ class PDBApp(Frame):
         self._btn_nav.grid(row=1, column=9, padx=2, pady=2, sticky=W+E)
 
         # Third line
+        self._overwrite = IntVar()
+        self._cb_overwrite = ttk.Checkbutton(master, text='Overwrite existing files',
+                                             variable=self._overwrite, onvalue=1, offvalue=0)
+        self._cb_overwrite.grid(row=2, column=0, columnspan=2, sticky=W+E, padx=2, pady=2)
         self._btn_fetch = ttk.Button(master, text='Fetch', command=self.fetch)
         self._btn_fetch.grid(row=2, column=7, columnspan=1, sticky=W+E, padx=2, pady=2)
         self._btn_download = ttk.Button(master, text='Download', command=self.download)
@@ -113,6 +117,7 @@ class PDBApp(Frame):
     def _update_dl_with_fields(self):
         self._dl._url = self._entry_rss.get()
         self._dl.folder(self._entry_folder.get())
+        self._dl.overwrite(self._overwrite.get() == 1)
 
     def _switch_action(self, action: bool):
         state_f_dl = DISABLED if action else NORMAL
@@ -124,7 +129,6 @@ class PDBApp(Frame):
     def download(self):
         self._clean_text_box()
         self._update_dl_with_fields()
-        self._dl.folder(self._entry_folder.get())
         logging.info("Start download")
         self._dl_thread = Thread(target=self._dl.download_mp3,
                                  kwargs={'cb': self._callback})
