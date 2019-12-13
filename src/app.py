@@ -7,11 +7,12 @@ from tkinter import filedialog
 from threading import Thread
 from src.bulk_downloader import BulkDownloader
 from src.callback import Callback
+from src import pbd_version
 
 
 def show_message_box_on_exception(exc: Exception):
-    messagebox.showerror(title='An exception occured',
-                         message='An exception occured:\n{}'
+    messagebox.showerror(title='An exception occurred',
+                         message='An exception occurred:\n{}'
                                  '\n\nDetails:\n{}'
                                  '\n\nPlease report the issue on GitHub'.format(exc, exc.args))
 
@@ -21,7 +22,7 @@ def show_message_box_on_exception(exc: Exception):
 class PDBApp(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
-        master.title('Podcast Bulk Downloader')
+        master.title('Podcast Bulk Downloader v{}'.format(pbd_version))
         # master.geometry('500x800')
         style = ttk.Style()
         self._style = StringVar()
@@ -175,7 +176,12 @@ class Log2Text(logging.Handler):
 
 def main():
     root = Tk()
-    root.iconbitmap('pbd_icon.ico')
+    icon_path = 'pbd_icon.ico'
+    if not os.path.isfile(icon_path):
+        icon_path = '../img/pbd_icon.ico'
+    if os.path.isfile(icon_path):
+        root.iconbitmap(icon_path)
+    
     try:
         PDBApp(root)
         root.mainloop()

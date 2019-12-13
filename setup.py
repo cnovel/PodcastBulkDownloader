@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
 from setuptools import setup
+from src import pbd_version
 
 setup(name='Podcast Bulk Downloader',
-      version='0.1',
+      version=pbd_version,
       description='Simple software for downloading all the episodes of a podcast',
       author='Cyril Novel',
       author_email='podcast.bulk@kosmon.fr',

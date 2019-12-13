@@ -7,6 +7,7 @@ from src.callback import Callback
 from time import sleep
 from xml.etree import ElementTree
 from typing import List
+from src import pbd_version
 
 
 class BulkDownloaderException(Exception):
@@ -260,6 +261,11 @@ def download_mp3s(url: str, folder: str, overwrite: bool = True):
     bulk_downloader.download_mp3()
 
 
+def print_version() -> int:
+    print(pbd_version)
+    return 0
+
+
 def main() -> int:
     """
     Main function for CLI
@@ -270,10 +276,21 @@ def main() -> int:
     logging.basicConfig(format=log_format)
     logging.captureWarnings(True)
     parser = argparse.ArgumentParser(description='Download MP3s from RSS feed or web folder')
-    parser.add_argument('--url', dest='url', help='URL to inspect', required=True)
-    parser.add_argument('-f', '--folder', dest='folder', help='Destination folder', required=True)
-    parser.add_argument('--overwrite', dest='overwrite', action='store_true')
+    parser.add_argument('--url', dest='url', help='URL to inspect for MP3s')
+    parser.add_argument('-f', '--folder', dest='folder',
+                        help='Destination folder for MP3 files')
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true',
+                        help='Will overwrite existing files')
+    parser.add_argument('-v', '--version', dest='version', action='store_true',
+                        help='Print version')
     args = parser.parse_args()
+
+    if args.version:
+        return print_version()
+
+    if not args.url or not args.folder:
+        logging.error('You need to set both URL and FOLDER')
+        return 1
 
     try:
         download_mp3s(args.url, args.folder, args.overwrite)

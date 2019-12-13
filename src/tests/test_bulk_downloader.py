@@ -1,8 +1,10 @@
 import pytest
 import os
+import sys
 from shutil import rmtree
 from .. import bulk_downloader as bd
 from src.callback import Callback
+from unittest.mock import patch
 
 
 def test_constructor():
@@ -63,6 +65,13 @@ def test_dl_dry_no_cb():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
     assert len(bdl.list_mp3()) > 0
     bdl.download_mp3(dry_run=True)
+
+
+def test_main_with_version():
+    args = ['script', '--version']
+    with patch.object(sys, 'argv', args):
+        res = bd.main()
+        assert res == 0
 
 
 @pytest.fixture(scope='module')
