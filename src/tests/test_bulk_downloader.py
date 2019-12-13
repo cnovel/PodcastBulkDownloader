@@ -91,5 +91,5 @@ def test_try_download_ko(tmp_directory):
 
 def test_dl_dry_files_exist(tmp_directory):
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', tmp_directory, False)
-    open("NAWAK1.mp3", "w")
+    open(os.path.join(tmp_directory, "NAWAK1.mp3"), "w")
     bdl.download_mp3(None, True)
