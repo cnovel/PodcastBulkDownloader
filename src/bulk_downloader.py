@@ -6,6 +6,7 @@ import argparse
 from src.callback import Callback
 from time import sleep
 from xml.etree import ElementTree
+from typing import List
 from setup import version
 
 
@@ -13,7 +14,14 @@ class BulkDownloaderException(Exception):
     pass
 
 
-def download_with_resume(url, path, cb: Callback = None):
+def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
+    """
+    Download a file pointed by url to a local path
+    @param url: URL to download
+    @param path: Local file to be saved
+    @param cb: Callback object
+    @return: True if the file was completely downloaded
+    """
     logging.debug("Downloading {} to {}".format(url, path))
 
     # Clean existing file
@@ -65,7 +73,16 @@ def download_with_resume(url, path, cb: Callback = None):
     return True
 
 
-def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None):
+def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> bool:
+    """
+    Try to download the file multiple times, in case of connection failures
+    @param url: URL to download
+    @param path: Local file to be saved
+    @param max_try: Number of download tries
+    @param sleep_time: Wait time between tries in second
+    @param cb: Callback object
+    @return: True if the file was completely downloaded
+    """
     count = 0
     while count < max_try:
         if download_with_resume(url, path, cb):
@@ -79,16 +96,44 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None):
 class BulkDownloader:
     _EXT = '.mp3'
 
-    def __init__(self, url: str, folder: str = None):
+    def __init__(self, url: str, folder: str = None, overwrite: bool = True):
+        """
+        Constructor of the bulkdownloader
+        @param url: URL of the RSS feed or web directory
+        @param folder: Folder where to save the MP3s
+        @param overwrite: Overwrite already downloaded files
+        """
         self._url = url
         self._folder = folder
+        self._overwrite = overwrite
+        
+    def overwrite(self, overwrite: bool = None) -> bool:
+        """
+        Set and return the overwrite parameter
+        @param overwrite: New overwrite value
+        @return: Overwrite value
+        """
+        if overwrite is not None:
+            self._overwrite = overwrite
+        return self._overwrite
 
-    def folder(self, folder: str = None):
+    def folder(self, folder: str = None) -> str:
+        """
+        Set and return the save folder
+        @param folder: New path of the folder
+        @return: Folder path
+        """
         if folder:
             self._folder = folder
         return self._folder
 
-    def list_mp3(self, cb: Callback = None, verbose=False):
+    def list_mp3(self, cb: Callback = None, verbose: bool = False) -> List[str]:
+        """
+        Will fetch the RSS or directory info and return the list of available MP3s
+        @param cb: Callback object
+        @param verbose: Outputs more logs
+        @return: List of MP3 urls
+        """
         try:
             r = requests.get(self._url)
         except requests.RequestException as exc:
@@ -116,7 +161,13 @@ class BulkDownloader:
                 logging.info(elem)
         return to_download
 
-    def download_mp3(self, cb: Callback = None, dry_run=False):
+    def download_mp3(self, cb: Callback = None, dry_run: bool = False):
+        """
+        Will get the list of MP3s and download them into the specified folder
+        @param cb: Callback object
+        @param dry_run: Will not actually download anythin (for test purposes only)
+        @return: None
+        """
         if not self.folder():
             err_str = 'No folder is defined for the download'
             logging.error(err_str)
@@ -126,25 +177,44 @@ class BulkDownloader:
         if cb:
             cb.progress(0)
         count = 0
-        step = 100. / len(to_download)
+        downloads_successful = 0
+        downloads_skipped = 0
+        nb_downloads = len(to_download)
+        step = 100. / nb_downloads
         for file in to_download:
             if cb:
                 if cb.is_cancelled():
                     return
                 cb.progress(count * step)
+
+            # Getting the name and path
             name = os.path.basename(file)
             name = name.replace('%20', ' ')
             path = os.path.join(self.folder(), name)
+
+            # Check if we should skip the file
+            if not self.overwrite() and os.path.isfile(path):
+                logging.info('Skipping {} as the file already exists at {}'.format(name, path))
+                downloads_skipped += 1
+                continue
+
+            # Download file
             logging.info('Saving {} to {} from {}'.format(name, path, file))
-            cb.set_function(lambda x: (count + x / 100) * step)
-            if not dry_run:
-                try_download(file, path, cb=cb)
-            cb.set_function(lambda x: x)
+            if cb:
+                cb.set_function(lambda x: (count + x / 100) * step)
+            if not dry_run and try_download(file, path, cb=cb):
+                downloads_successful += 1
+            if cb:
+                cb.set_function(lambda x: x)
             count += 1
         if cb:
             cb.progress(100)
+        logging.info('{}/{} episodes were successfully downloaded'.format(downloads_successful,
+                                                                          nb_downloads))
+        logging.info('{}/{} episodes were skipped because files already existed'
+                     .format(downloads_skipped, nb_downloads))
 
-    def _get_url_to_download_from_html(self, page):
+    def _get_url_to_download_from_html(self, page) -> List[str]:
         soup = BeautifulSoup(page, 'html.parser')
         return [self._url + '/' + node.get('href') for node in soup.find_all('a') if
                 node.get('href').endswith(BulkDownloader._EXT)]
@@ -175,25 +245,40 @@ class BulkDownloader:
             return False
 
 
-def download_mp3s(url, folder):
+def download_mp3s(url: str, folder: str, overwrite: bool = True):
+    """
+    Will create a BulkDownloader and download all the mp3s from an URL to the folder
+    @param url: Directory/RSS url
+    @param folder: Where to save the MP3s
+    @param overwrite: Overwrite existing files
+    """
     logging.info('Downloading mp3s from {} to {}'.format(url, folder))
-    bulk_downloader = BulkDownloader(url, folder)
+    if overwrite:
+        logging.info('Already existing file will be overwritten')
+    else:
+        logging.info('Already existing file won\'t be overwritten')
+    bulk_downloader = BulkDownloader(url, folder, overwrite)
     bulk_downloader.download_mp3()
 
 
-def main():
+def main() -> int:
+    """
+    Main function for CLI
+    @return: Int exit code
+    """
     logging.getLogger().setLevel(logging.INFO)
     log_format = "[%(levelname)s] %(message)s"
     logging.basicConfig(format=log_format)
     logging.captureWarnings(True)
     logging.info('Podcast Bulk Downloader v{}'.format(version))
     parser = argparse.ArgumentParser(description='Download MP3s from RSS feed or web folder')
-    parser.add_argument('--url', dest='url', help='URL to inspect')
-    parser.add_argument('-f', '--folder', dest='folder', help='Destination folder')
+    parser.add_argument('--url', dest='url', help='URL to inspect', required=True)
+    parser.add_argument('-f', '--folder', dest='folder', help='Destination folder', required=True)
+    parser.add_argument('--overwrite', dest='overwrite', action='store_true')
     args = parser.parse_args()
 
     try:
-        download_mp3s(args.url, args.folder)
+        download_mp3s(args.url, args.folder, args.overwrite)
     except Exception as exc:
         logging.error(exc)
         return 1
