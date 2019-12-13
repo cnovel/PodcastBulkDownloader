@@ -24,7 +24,15 @@ PodcastBulkDownloaderCLI.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://f
 ### GUI Version
 ![PBD_GUI](img/PBD_GUI.png)
 
-It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed. Then fill the Folder field and click download to download the episodes.
+It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed.
+Then fill the Folder field and click download to download the episodes.
+Logs will be displayed in the bottom part and will warn you if the software ran into issues.
+Check the overwrite checkbox if you want to redownload all the episodes.
+Overwriting is solely based on filename, it doesn't do any checks at the moment.
+
+#### Known issues
+* Cancel button crashes the app when clicked while downloading
+
 
 ## How to build _PBD_
 ### Build and run tests
