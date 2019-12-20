@@ -107,7 +107,7 @@ class BulkDownloader:
         self._url = url
         self._folder = folder
         self._overwrite = overwrite
-        
+
     def overwrite(self, overwrite: bool = None) -> bool:
         """
         Set and return the overwrite parameter

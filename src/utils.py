@@ -45,7 +45,7 @@ def get_unique_names(to_download: List[str]):
             if not names_are_unique(unique_names):
                 continue  # No need to compute other paths as we already have a conflict
             unique_names.append(get_path_at_level(name, level))
-        
+
         # Check if all names are uniques
         if names_are_unique(unique_names):
             break
