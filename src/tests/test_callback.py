@@ -1,6 +1,6 @@
 from os import environ
 from tkinter.ttk import Progressbar
-from .. import callback
+from src import callback
 
 
 def test_callback_pb():
