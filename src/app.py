@@ -181,7 +181,7 @@ def main():
         icon_path = '../img/pbd_icon.ico'
     if os.path.isfile(icon_path):
         root.iconbitmap(icon_path)
-    
+
     try:
         PDBApp(root)
         root.mainloop()
