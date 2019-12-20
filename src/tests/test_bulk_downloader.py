@@ -2,7 +2,7 @@ import pytest
 import os
 import sys
 from shutil import rmtree
-from .. import bulk_downloader as bd
+from src import bulk_downloader as bd
 from src.callback import Callback
 from unittest.mock import patch
 

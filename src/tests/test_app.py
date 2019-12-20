@@ -1,6 +1,6 @@
 from os import environ
 from tkinter import *
-from .. import app
+from src import app
 
 
 def test_app():
