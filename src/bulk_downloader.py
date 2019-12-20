@@ -8,6 +8,7 @@ from time import sleep
 from xml.etree import ElementTree
 from typing import List
 from src import pbd_version
+from src.utils import get_unique_names
 
 
 class BulkDownloaderException(Exception):
@@ -180,30 +181,29 @@ class BulkDownloader:
         downloads_successful = 0
         downloads_skipped = 0
         nb_downloads = len(to_download)
+        unique_names = get_unique_names(to_download)
         step = 100. / nb_downloads
-        for file in to_download:
+        for p_url_name in unique_names:
             if cb:
                 if cb.is_cancelled():
                     return
                 cb.progress(count * step)
 
             # Getting the name and path
-            name = os.path.basename(file)
-            name = name.replace('%20', ' ')
-            path = os.path.join(self.folder(), name)
+            path = os.path.join(self.folder(), p_url_name[1])
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
-                logging.info('Skipping {} as the file already exists at {}'.format(name, path))
+                logging.info('Skipping {} as the file already exists at {}'.format(p_url_name[1], path))
                 downloads_skipped += 1
                 count += 1
                 continue
 
             # Download file
-            logging.info('Saving {} to {} from {}'.format(name, path, file))
+            logging.info('Saving {} to {} from {}'.format(p_url_name[1], path, p_url_name[0]))
             if cb:
                 cb.set_function(lambda x: (count + x / 100) * step)
-            if not dry_run and try_download(file, path, cb=cb):
+            if not dry_run and try_download(p_url_name[0], path, cb=cb):
                 downloads_successful += 1
             if cb:
                 cb.set_function(lambda x: x)
