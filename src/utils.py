@@ -55,6 +55,6 @@ def get_unique_names(to_download: List[str]):
 
     pairs = []
     for i in range(len(to_download)):
-        pairs.append((to_download[i], unique_names[i].replace('/', '_').replace('%20', ' ')))
+        pairs.append((to_download[i], unique_names[i].replace('/', '_').replace('\\', '_').replace('%20', ' ')))
 
     return pairs

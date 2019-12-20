@@ -1,10 +1,11 @@
 from src import utils
+from os.path import join
 
 
 def test_path_at_level():
     p = 'https://media.acast.com/qommute/episode-4-lamarcheapied/media.mp3'
     assert 'media.mp3' == utils.get_path_at_level(p, 0)
-    assert 'episode-4-lamarcheapied/media.mp3' == utils.get_path_at_level(p, 1)
+    assert join('episode-4-lamarcheapied', 'media.mp3') == utils.get_path_at_level(p, 1)
 
 
 def test_unique_names():
