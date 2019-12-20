@@ -196,6 +196,7 @@ class BulkDownloader:
             if not self.overwrite() and os.path.isfile(path):
                 logging.info('Skipping {} as the file already exists at {}'.format(name, path))
                 downloads_skipped += 1
+                count += 1
                 continue
 
             # Download file
