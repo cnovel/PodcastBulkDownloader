@@ -110,7 +110,7 @@ def test_try_download_cancel(tmp_directory):
     cb = Callback()
     cb.cancel()
     assert not bd.try_download('https://feeds.radiokawa.com/podcast_nawak.xml',
-                                os.path.join(tmp_directory, 't.xml'), 1, 1, cb)
+                               os.path.join(tmp_directory, 't.xml'), 1, 1, cb)
 
 
 def test_dl_dry_files_exist(tmp_directory):
