@@ -61,6 +61,14 @@ def test_dl_dry():
     bdl.download_mp3(dry_run=True, cb=cb)
 
 
+def test_dl_dry_cancel():
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
+    assert len(bdl.list_mp3()) > 0
+    cb = Callback()
+    cb.cancel()
+    bdl.download_mp3(dry_run=True, cb=cb)
+
+
 def test_dl_dry_no_cb():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
     assert len(bdl.list_mp3()) > 0
@@ -96,6 +104,13 @@ def test_try_download_ok(tmp_directory):
 def test_try_download_ko(tmp_directory):
     assert not bd.try_download('http://www.acute3d.com/embed/Logo-pix4d.png',
                                os.path.join(tmp_directory, 'pix4d.png'), 2, 1)
+
+
+def test_try_download_cancel(tmp_directory):
+    cb = Callback()
+    cb.cancel()
+    assert not bd.try_download('https://feeds.radiokawa.com/podcast_nawak.xml',
+                                os.path.join(tmp_directory, 't.xml'), 1, 1, cb)
 
 
 def test_dl_dry_files_exist(tmp_directory):
