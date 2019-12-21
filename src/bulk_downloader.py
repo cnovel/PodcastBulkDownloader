@@ -179,6 +179,8 @@ class BulkDownloader:
             raise BulkDownloaderException(err_str)
         to_download = self.list_mp3(cb)
         logging.info('{} files will be downloaded'.format(len(to_download)))
+        if cb and cb.is_cancelled():
+            return
         if cb:
             cb.progress(0)
         count = 0
