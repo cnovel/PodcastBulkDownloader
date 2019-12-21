@@ -69,6 +69,8 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
                     cb.progress(100 * (last_byte / expected_size))
                 f.write(data)
             resume_request.close()
+    if cb and cb.is_cancelled():
+        return False
     if cb:
         cb.progress(100)
     return True
@@ -88,6 +90,8 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> boo
     while count < max_try:
         if download_with_resume(url, path, cb):
             return True
+        if cb and cb.is_cancelled():
+            return False
         count += 1
         sleep(sleep_time)
     logging.error('Download of {} failed after {} tries'.format(url, max_try))
@@ -186,7 +190,7 @@ class BulkDownloader:
         for p_url_name in unique_names:
             if cb:
                 if cb.is_cancelled():
-                    return
+                    continue
                 cb.progress(count * step)
 
             # Getting the name and path
@@ -208,6 +212,10 @@ class BulkDownloader:
             if cb:
                 cb.set_function(lambda x: x)
             count += 1
+
+        if cb and cb.is_cancelled():
+            return
+
         if cb:
             cb.progress(100)
         logging.info('{}/{} episodes were successfully downloaded'.format(downloads_successful,
