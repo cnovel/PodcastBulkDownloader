@@ -20,3 +20,10 @@ def test_unique():
     assert not utils.names_are_unique(names)
     names = ['a', 'b', 'c']
     assert utils.names_are_unique(names)
+
+
+def test_exclude_params():
+    n = utils.exclude_params('BNApPcKkPlOj.mp3?t=1579538694')
+    assert 'BNApPcKkPlOj.mp3' == n
+    n = utils.exclude_params('BNApPcKkPlOj.mp3')
+    assert 'BNApPcKkPlOj.mp3' == n
