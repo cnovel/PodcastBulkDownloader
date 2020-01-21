@@ -30,10 +30,6 @@ Logs will be displayed in the bottom part and will warn you if the software ran 
 Check the overwrite checkbox if you want to redownload all the episodes.
 Overwriting is solely based on filename, it doesn't do any checks at the moment.
 
-#### Known issues
-* Cancel button crashes the app when clicked while downloading
-
-
 ## How to build _PBD_
 ### Build and run tests
 We are supporting Python 3.7 and above. Project may work for earlier version tough it is not guaranteed.
