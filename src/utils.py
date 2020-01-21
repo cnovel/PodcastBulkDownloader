@@ -31,6 +31,18 @@ def names_are_unique(unique_names: List[str]) -> bool:
     return len(set(unique_names)) == len(unique_names)
 
 
+def exclude_params(name: str) -> str:
+    """
+    Crop the name if it discovers parameters at the end
+    @param name: Name ot inspect
+    @return: Name without params
+    """
+    params_index = name.find('?')
+    if params_index >= 0:
+        name = name[0:params_index]
+    return name
+
+
 def get_unique_names(to_download: List[str]):
     """
     From a list of MP3s url to download, create a pair made of the URL and a
@@ -55,6 +67,10 @@ def get_unique_names(to_download: List[str]):
 
     pairs = []
     for i in range(len(to_download)):
-        pairs.append((to_download[i], unique_names[i].replace('/', '_').replace('\\', '_').replace('%20', ' ')))
+        pairs.append((to_download[i],
+                      exclude_params(unique_names[i]
+                                     .replace('/', '_')
+                                     .replace('\\', '_')
+                                     .replace('%20', ' '))))
 
     return pairs
