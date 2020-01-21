@@ -97,13 +97,13 @@ def tmp_directory(request):
 
 def test_try_download_ok(tmp_directory):
     cb = Callback()
-    assert bd.try_download('http://www.acute3d.com/embed/Logo-acute3D.png',
-                           os.path.join(tmp_directory, 'acute3d.png'), 2, 1, cb)
+    assert bd.try_download('http://xerto.free.fr/newban.jpg',
+                           os.path.join(tmp_directory, 'newban.jpg'), 2, 1, cb)
 
 
 def test_try_download_ko(tmp_directory):
-    assert not bd.try_download('http://www.acute3d.com/embed/Logo-pix4d.png',
-                               os.path.join(tmp_directory, 'pix4d.png'), 2, 1)
+    assert not bd.try_download('http://xerto.free.fr/pouet.jpg',
+                               os.path.join(tmp_directory, 'pouet.jpg'), 2, 1)
 
 
 def test_try_download_cancel(tmp_directory):
