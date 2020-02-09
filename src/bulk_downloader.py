@@ -3,6 +3,8 @@ import requests
 import os.path
 import logging
 import argparse
+import re
+from pyPodcastParser.Podcast import Podcast
 from src.callback import Callback
 from time import sleep
 from xml.etree import ElementTree
@@ -98,6 +100,38 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> boo
     return False
 
 
+class Episode:
+    def __init__(self, url: str, title: str):
+        """
+        Constructor for a podcast episode
+        @param url: URL of the MP3 file
+        @param title: Title of the episode
+        """
+        self._url = url
+        self._title = title
+
+    def title(self, title: str = None) -> str:
+        if title is not None:
+            self._title = title
+        return self._title
+
+    def url(self) -> str:
+        return self._url
+
+    def safe_title(self) -> str:
+        """
+        Returns a title that can be saved on disk
+        """
+        no_invalid = re.sub(r'[\\/:"*?<>|]+', '', self.title())
+        return re.sub(' +', ' ', no_invalid).strip()
+
+    def get_filename(self) -> str:
+        return self.safe_title() + '.mp3'
+
+    def __str__(self) -> str:
+        return 'Episode "{} ({})'.format(self.title(), self.url())
+
+
 class BulkDownloader:
     _EXT = '.mp3'
 
@@ -132,7 +166,7 @@ class BulkDownloader:
             self._folder = folder
         return self._folder
 
-    def list_mp3(self, cb: Callback = None, verbose: bool = False) -> List[str]:
+    def list_mp3(self, cb: Callback = None, verbose: bool = False) -> List[Episode]:
         """
         Will fetch the RSS or directory info and return the list of available MP3s
         @param cb: Callback object
@@ -154,10 +188,10 @@ class BulkDownloader:
             return []
         if self._page_is_rss(page):
             logging.info('Processing RSS document')
-            to_download = self._get_url_to_download_from_rss(page)
+            to_download = self._get_episodes_to_download_from_rss(page)
         else:
             logging.info('Processing HTML document')
-            to_download = self._get_url_to_download_from_html(page)
+            to_download = self._get_episodes_to_download_from_html(page)
         if cb and cb.is_cancelled():
             return []
         if verbose:
@@ -225,28 +259,19 @@ class BulkDownloader:
         logging.info('{}/{} episodes were skipped because files already existed'
                      .format(downloads_skipped, nb_downloads))
 
-    def _get_url_to_download_from_html(self, page) -> List[str]:
+    def _get_episodes_to_download_from_html(self, page) -> List[Episode]:
         soup = BeautifulSoup(page, 'html.parser')
-        return [self._url + '/' + node.get('href') for node in soup.find_all('a') if
-                node.get('href').endswith(BulkDownloader._EXT)]
+        links = [self._url + '/' + node.get('href') for node in soup.find_all('a') if
+                 node.get('href').endswith(BulkDownloader._EXT)]
+        return [Episode(url, name) for url in links]
 
     @staticmethod
-    def _get_url_to_download_from_rss(page):
-        elem = ElementTree.XML(page)
-        urls = BulkDownloader._get_mp3_urls_recursively(elem)
-        return sorted(list(set(urls)))
-
-    @staticmethod
-    def _get_mp3_urls_recursively(root):
-        urls = []
-        for node in root:
-            if 'url' in node.attrib and \
-                    (node.attrib['url'].endswith(BulkDownloader._EXT) or
-                     BulkDownloader._EXT + '?' in node.attrib['url']):
-                urls.append(node.attrib['url'].replace('&amp;', '&'))
-            urls += BulkDownloader._get_mp3_urls_recursively(node)
-
-        return urls
+    def _get_episodes_to_download_from_rss(page) -> List[Episode]:
+        episodes = []
+        pod_feed = Podcast(page)
+        for item in pod_feed.items:
+            episodes.append(Episode(item.enclosure_url, item.title))
+        return episodes
 
     @staticmethod
     def _page_is_rss(page):

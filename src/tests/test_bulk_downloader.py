@@ -117,3 +117,15 @@ def test_dl_dry_files_exist(tmp_directory):
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', tmp_directory, False)
     open(os.path.join(tmp_directory, "NAWAK1.mp3"), "w")
     bdl.download_mp3(None, True)
+
+
+def test_episode():
+    ep1 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK7.mp3', 'Nawak 7')
+    assert ep1.title() == 'Nawak 7'
+    assert ep1.title("Nawak 7 avec Yann")
+    assert ep1.safe_title() == 'Nawak 7 avec Yann'
+    assert ep1.url() == 'https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK7.mp3'
+
+    ep2 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK6.mp3',
+                     'Nawak 6 : Qu\'est-ce qu\'on fait demain ?')
+    assert ep2.get_filename() == 'Nawak 6 Qu\'est-ce qu\'on fait demain.mp3'
