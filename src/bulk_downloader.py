@@ -10,7 +10,6 @@ from time import sleep
 from xml.etree import ElementTree
 from typing import List
 from src import pbd_version
-from src.utils import get_unique_names
 
 
 class BulkDownloaderException(Exception):
@@ -129,7 +128,7 @@ class Episode:
         return self.safe_title() + '.mp3'
 
     def __str__(self) -> str:
-        return 'Episode "{} ({})'.format(self.title(), self.url())
+        return 'Episode "{}" ({})'.format(self.title(), self.url())
 
 
 class BulkDownloader:
@@ -183,15 +182,16 @@ class BulkDownloader:
             err_str = 'Failed to access URL (code {})'.format(r.status_code)
             logging.error(err_str)
             raise BulkDownloaderException(err_str)
-        page = r.text
+        page = r.content
         if cb and cb.is_cancelled():
             return []
         if self._page_is_rss(page):
             logging.info('Processing RSS document')
             to_download = self._get_episodes_to_download_from_rss(page)
         else:
-            logging.info('Processing HTML document')
-            to_download = self._get_episodes_to_download_from_html(page)
+            err_str = 'Content is not RSS'
+            logging.error(err_str)
+            raise BulkDownloaderException(err_str)
         if cb and cb.is_cancelled():
             return []
         if verbose:
@@ -221,29 +221,30 @@ class BulkDownloader:
         downloads_successful = 0
         downloads_skipped = 0
         nb_downloads = len(to_download)
-        unique_names = get_unique_names(to_download)
         step = 100. / nb_downloads
-        for p_url_name in unique_names:
+        for episode in to_download:
             if cb:
                 if cb.is_cancelled():
                     continue
                 cb.progress(count * step)
 
             # Getting the name and path
-            path = os.path.join(self.folder(), p_url_name[1])
+            path = os.path.join(self.folder(), episode.get_filename())
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
-                logging.info('Skipping {} as the file already exists at {}'.format(p_url_name[1], path))
+                logging.info('Skipping {} as the file already exists at {}'
+                             .format(episode.get_filename(), path))
                 downloads_skipped += 1
                 count += 1
                 continue
 
             # Download file
-            logging.info('Saving {} to {} from {}'.format(p_url_name[1], path, p_url_name[0]))
+            logging.info('Saving {} to {} from {}'.format(episode.get_filename(), path,
+                                                          episode.url()))
             if cb:
                 cb.set_function(lambda x: (count + x / 100) * step)
-            if not dry_run and try_download(p_url_name[0], path, cb=cb):
+            if not dry_run and try_download(episode.url(), path, cb=cb):
                 downloads_successful += 1
             if cb:
                 cb.set_function(lambda x: x)
@@ -258,12 +259,6 @@ class BulkDownloader:
                                                                           nb_downloads))
         logging.info('{}/{} episodes were skipped because files already existed'
                      .format(downloads_skipped, nb_downloads))
-
-    def _get_episodes_to_download_from_html(self, page) -> List[Episode]:
-        soup = BeautifulSoup(page, 'html.parser')
-        links = [self._url + '/' + node.get('href') for node in soup.find_all('a') if
-                 node.get('href').endswith(BulkDownloader._EXT)]
-        return [Episode(url, name) for url in links]
 
     @staticmethod
     def _get_episodes_to_download_from_rss(page) -> List[Episode]:
