@@ -7,14 +7,15 @@
 
 ## How to use Podcast Bulk Downloader
 ### CLI version
-Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite]`
+Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite] [-l LAST_N]`
 
 Arguments:
 * `-h`, `--help`: shows this help message and exit
 * `--url URL`: URL to inspect for MP3s
 * `-f FOLDER`, `--folder FOLDER`: Destination folder for MP3 files
 * `--overwrite`: Will overwrite existing files
-* `version`: Print version
+* `-l LAST_N`, `--last LAST_N`: Will only download the last N episodes. If N=0, download all the episodes
+* `-v`, `--version`: Print version
 
 Example:
 ```
@@ -22,13 +23,14 @@ PodcastBulkDownloaderCLI.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://f
 ```
 
 ### GUI Version
-![PBD_GUI](img/PBD_GUI.png)
+![PBD_GUI](img/PBD_GUI_v0.5.png)
 
 It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed.
 Then fill the Folder field and click download to download the episodes.
 Logs will be displayed in the bottom part and will warn you if the software ran into issues.
 Check the overwrite checkbox if you want to redownload all the episodes.
 Overwriting is solely based on filename, it doesn't do any checks at the moment.
+If you want to download only the last N episodes, check the corresponding box and fill the number of episodes wanted.
 
 ## How to build _PBD_
 ### Build and run tests
