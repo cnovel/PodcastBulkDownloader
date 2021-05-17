@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 
 def test_constructor():
-    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', False)
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', 0, False)
     assert bdl._url == 'https://feeds.radiokawa.com/podcast_nawak.xml'
     assert bdl.folder() == './dl'
     assert not bdl.overwrite()
@@ -21,7 +21,7 @@ def test_set_folder():
 
 
 def test_set_overwrite():
-    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', False)
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', 0, False)
     assert not bdl.overwrite()
     bdl.overwrite(True)
     assert bdl.overwrite()
@@ -29,10 +29,23 @@ def test_set_overwrite():
     assert not bdl.overwrite()
 
 
+def test_set_last_n():
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', 2)
+    assert bdl.last_n() == 2
+    bdl.last_n(10)
+    assert bdl.last_n() == 10
+
+
 def test_list_mp3():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl')
     cb = Callback()
     assert len(bdl.list_mp3(cb, True)) > 0
+
+
+def test_list_mp3_limited():
+    bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', 2)
+    cb = Callback()
+    assert len(bdl.list_mp3(cb, True)) == 2
 
 
 def test_wrong_feed():

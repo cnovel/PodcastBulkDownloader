@@ -1,1 +1,1 @@
-pbd_version = '0.4'
+pbd_version = '0.5'
