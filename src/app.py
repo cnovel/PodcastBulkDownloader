@@ -23,7 +23,7 @@ class PDBApp(Frame):
     def __init__(self, master):
         Frame.__init__(self, master)
         master.title('Podcast Bulk Downloader v{}'.format(pbd_version))
-        # master.geometry('500x800')
+        master.geometry('900x500')
         style = ttk.Style()
         self._style = StringVar()
         if 'vista' in style.theme_names():
@@ -59,9 +59,22 @@ class PDBApp(Frame):
 
         # Third line
         self._overwrite = IntVar()
-        self._cb_overwrite = ttk.Checkbutton(master, text='Overwrite existing files',
+        self._cb_overwrite = ttk.Checkbutton(master, text='Overwrite',
                                              variable=self._overwrite, onvalue=1, offvalue=0)
-        self._cb_overwrite.grid(row=2, column=0, columnspan=2, sticky=W+E, padx=2, pady=2)
+        self._cb_overwrite.grid(row=2, column=0, columnspan=1, sticky=W+E, padx=2, pady=2)
+
+        self._activate_last_n = IntVar()
+        self._cb_activate_last_n = ttk.Checkbutton(master, text='Download only the last ',
+                                                   variable=self._activate_last_n, onvalue=1, offvalue=0,
+                                                   command=self._toggle_last_n)
+        self._cb_activate_last_n.grid(row=2, column=1, columnspan=1, sticky=W+E, padx=2, pady=2)
+        self._last_n = StringVar(value="1")
+        self._sb_last_n = ttk.Spinbox(master, from_=1, to=50000, textvariable=self._last_n)
+        self._sb_last_n.configure(state=DISABLED)
+        self._sb_last_n.grid(row=2, column=2, sticky=W+E, padx=2, pady=2)
+        self._label_episodes = ttk.Label(master, text='episodes')
+        self._label_episodes.grid(row=2, column=3, padx=2, sticky=W)
+
         self._btn_fetch = ttk.Button(master, text='Fetch', command=self.fetch)
         self._btn_fetch.grid(row=2, column=7, columnspan=1, sticky=W+E, padx=2, pady=2)
         self._btn_download = ttk.Button(master, text='Download', command=self.download)
@@ -119,6 +132,7 @@ class PDBApp(Frame):
         self._dl._url = self._entry_rss.get()
         self._dl.folder(self._entry_folder.get())
         self._dl.overwrite(self._overwrite.get() == 1)
+        self._dl.last_n(0 if self._activate_last_n.get() == 0 else int(self._last_n.get()))
 
     def _switch_action(self, action: bool):
         state_f_dl = DISABLED if action else NORMAL
@@ -126,6 +140,12 @@ class PDBApp(Frame):
         self._btn_download.configure(state=state_f_dl)
         self._btn_fetch.configure(state=state_f_dl)
         self._btn_cancel.configure(state=state_cancel)
+
+    def _toggle_last_n(self):
+        if self._activate_last_n.get() == 1:
+            self._sb_last_n.configure(state=NORMAL)
+        else:
+            self._sb_last_n.configure(state=DISABLED)
 
     def download(self):
         self._clean_text_box()

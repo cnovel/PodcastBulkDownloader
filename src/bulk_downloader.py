@@ -134,16 +134,28 @@ class Episode:
 class BulkDownloader:
     _EXT = '.mp3'
 
-    def __init__(self, url: str, folder: str = None, overwrite: bool = True):
+    def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True):
         """
         Constructor of the bulkdownloader
         @param url: URL of the RSS feed or web directory
         @param folder: Folder where to save the MP3s
+        @param last_n: Only download the last N episodes, all if N = 0
         @param overwrite: Overwrite already downloaded files
         """
         self._url = url
         self._folder = folder
+        self._last_n = last_n
         self._overwrite = overwrite
+
+    def last_n(self, n: int = None):
+        """
+        Set and return the last_n parameter
+        @param n: New last_n value
+        @return: last_n value
+        """
+        if n is not None:
+            self._last_n = n
+        return self._last_n
 
     def overwrite(self, overwrite: bool = None) -> bool:
         """
@@ -188,6 +200,9 @@ class BulkDownloader:
         if self._page_is_rss(page):
             logging.info('Processing RSS document')
             to_download = self._get_episodes_to_download_from_rss(page)
+            # We trim the list if needed
+            if 0 < self._last_n < len(to_download):
+                to_download = to_download[0:self._last_n]
         else:
             err_str = 'Content is not RSS'
             logging.error(err_str)
@@ -276,11 +291,12 @@ class BulkDownloader:
             return False
 
 
-def download_mp3s(url: str, folder: str, overwrite: bool = True):
+def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True):
     """
     Will create a BulkDownloader and download all the mp3s from an URL to the folder
     @param url: Directory/RSS url
     @param folder: Where to save the MP3s
+    @param last_n: Only download the last N episodes, all if N = 0
     @param overwrite: Overwrite existing files
     """
     logging.info('Downloading mp3s from {} to {}'.format(url, folder))
@@ -288,7 +304,7 @@ def download_mp3s(url: str, folder: str, overwrite: bool = True):
         logging.info('Already existing file will be overwritten')
     else:
         logging.info('Already existing file won\'t be overwritten')
-    bulk_downloader = BulkDownloader(url, folder, overwrite)
+    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite)
     bulk_downloader.download_mp3()
 
 
@@ -314,6 +330,8 @@ def main() -> int:
                         help='Will overwrite existing files')
     parser.add_argument('-v', '--version', dest='version', action='store_true',
                         help='Print version')
+    parser.add_argument('-l', '--last', dest='last_n', default=0,
+                        help='Only download the last N episodes, if N=0, download all the episodes')
     args = parser.parse_args()
 
     if args.version:
@@ -324,7 +342,7 @@ def main() -> int:
         return 1
 
     try:
-        download_mp3s(args.url, args.folder, args.overwrite)
+        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite)
     except Exception as exc:
         logging.error(exc)
         return 1
