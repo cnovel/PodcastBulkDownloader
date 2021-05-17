@@ -342,7 +342,7 @@ def main() -> int:
         return 1
 
     try:
-        download_mp3s(args.url, args.folder, args.overwrite)
+        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite)
     except Exception as exc:
         logging.error(exc)
         return 1
