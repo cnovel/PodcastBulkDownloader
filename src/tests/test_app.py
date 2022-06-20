@@ -1,4 +1,3 @@
-from os import environ
 from tkinter import *
 from src import app
 
