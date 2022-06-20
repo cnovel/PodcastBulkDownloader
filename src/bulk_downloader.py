@@ -206,7 +206,10 @@ class BulkDownloader:
         @return: List of MP3 urls
         """
         try:
-            r = requests.get(self._url)
+            headers = {'Accept': '*/*',
+                       'User-Agent': 'PodcastBulkDownloader v' + pbd_version,
+                       'Accept-Encoding': 'gzip, deflate, br'}
+            r = requests.get(self._url, headers=headers)
         except requests.RequestException as exc:
             err_str = 'Failed to connect to URL ({})'.format(exc)
             logging.error(err_str)
