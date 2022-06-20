@@ -1,4 +1,3 @@
-from bs4 import BeautifulSoup
 import requests
 import os.path
 import logging
@@ -100,14 +99,16 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> boo
 
 
 class Episode:
-    def __init__(self, url: str, title: str):
+    def __init__(self, url: str, title: str, date_time: str):
         """
         Constructor for a podcast episode
         @param url: URL of the MP3 file
         @param title: Title of the episode
+        @param date_time: Date time of the episode
         """
         self._url = url
         self._title = title
+        self._date_time = date_time
 
     def title(self, title: str = None) -> str:
         if title is not None:
@@ -127,6 +128,12 @@ class Episode:
     def get_filename(self) -> str:
         return self.safe_title() + '.mp3'
 
+    def get_date_time(self) -> str:
+        return self._date_time
+
+    def get_prefixed_filename(self) -> str:
+        return self.get_date_time() + ' ' + self.get_filename()
+
     def __str__(self) -> str:
         return 'Episode "{}" ({})'.format(self.title(), self.url())
 
@@ -134,18 +141,21 @@ class Episode:
 class BulkDownloader:
     _EXT = '.mp3'
 
-    def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True):
+    def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True,
+                 prefix_with_datetime: bool = False):
         """
         Constructor of the bulkdownloader
         @param url: URL of the RSS feed or web directory
         @param folder: Folder where to save the MP3s
         @param last_n: Only download the last N episodes, all if N = 0
         @param overwrite: Overwrite already downloaded files
+        @param prefix_with_datetime: Add datetime for each file name
         """
         self._url = url
         self._folder = folder
         self._last_n = last_n
         self._overwrite = overwrite
+        self._prefix = prefix_with_datetime
 
     def last_n(self, n: int = None):
         """
@@ -166,6 +176,16 @@ class BulkDownloader:
         if overwrite is not None:
             self._overwrite = overwrite
         return self._overwrite
+
+    def prefix_with_datetime(self, prefix: bool = None) -> bool:
+        """
+        Set and return the prefix with datetime parameter
+        @param prefix: New prefix value
+        @return: Prefix value
+        """
+        if prefix is not None:
+            self._prefix = prefix
+        return self._prefix
 
     def folder(self, folder: str = None) -> str:
         """
@@ -244,7 +264,8 @@ class BulkDownloader:
                 cb.progress(count * step)
 
             # Getting the name and path
-            path = os.path.join(self.folder(), episode.get_filename())
+            name = episode.get_prefixed_filename() if self.prefix_with_datetime() else episode.get_filename()
+            path = os.path.join(self.folder(), name)
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
@@ -280,7 +301,8 @@ class BulkDownloader:
         episodes = []
         pod_feed = Podcast(page)
         for item in pod_feed.items:
-            episodes.append(Episode(item.enclosure_url, item.title))
+            episodes.append(Episode(item.enclosure_url, item.title,
+                                    item.date_time.date().isoformat().replace(':', '-')))
         return episodes
 
     @staticmethod
@@ -291,20 +313,21 @@ class BulkDownloader:
             return False
 
 
-def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True):
+def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, prefix_with_datetime: bool = False):
     """
     Will create a BulkDownloader and download all the mp3s from an URL to the folder
     @param url: Directory/RSS url
     @param folder: Where to save the MP3s
     @param last_n: Only download the last N episodes, all if N = 0
     @param overwrite: Overwrite existing files
+    @param prefix_with_datetime: Add publication date time for each file
     """
     logging.info('Downloading mp3s from {} to {}'.format(url, folder))
     if overwrite:
         logging.info('Already existing file will be overwritten')
     else:
         logging.info('Already existing file won\'t be overwritten')
-    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite)
+    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite, prefix_with_datetime)
     bulk_downloader.download_mp3()
 
 
@@ -332,6 +355,8 @@ def main() -> int:
                         help='Print version')
     parser.add_argument('-l', '--last', dest='last_n', default=0,
                         help='Only download the last N episodes, if N=0, download all the episodes')
+    parser.add_argument('--prefix_with_datetime', dest='prefix', action='store_true',
+                        help='Will prefix file names with publication datetime')
     args = parser.parse_args()
 
     if args.version:
@@ -342,7 +367,7 @@ def main() -> int:
         return 1
 
     try:
-        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite)
+        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite, args.prefix)
     except Exception as exc:
         logging.error(exc)
         return 1

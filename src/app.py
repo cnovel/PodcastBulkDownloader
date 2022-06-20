@@ -64,7 +64,7 @@ class PDBApp(Frame):
         self._cb_overwrite.grid(row=2, column=0, columnspan=1, sticky=W+E, padx=2, pady=2)
 
         self._activate_last_n = IntVar()
-        self._cb_activate_last_n = ttk.Checkbutton(master, text='Download only the last ',
+        self._cb_activate_last_n = ttk.Checkbutton(master, text='Download only last ',
                                                    variable=self._activate_last_n, onvalue=1, offvalue=0,
                                                    command=self._toggle_last_n)
         self._cb_activate_last_n.grid(row=2, column=1, columnspan=1, sticky=W+E, padx=2, pady=2)
@@ -74,6 +74,11 @@ class PDBApp(Frame):
         self._sb_last_n.grid(row=2, column=2, sticky=W+E, padx=2, pady=2)
         self._label_episodes = ttk.Label(master, text='episodes')
         self._label_episodes.grid(row=2, column=3, padx=2, sticky=W)
+
+        self._prefix = IntVar()
+        self._cb_prefix = ttk.Checkbutton(master, text='Prefix with date',
+                                          variable=self._prefix, onvalue=1, offvalue=0)
+        self._cb_prefix.grid(row=2, column=4, columnspan=1, sticky=W+E, padx=2, pady=2)
 
         self._btn_fetch = ttk.Button(master, text='Fetch', command=self.fetch)
         self._btn_fetch.grid(row=2, column=7, columnspan=1, sticky=W+E, padx=2, pady=2)
@@ -132,6 +137,7 @@ class PDBApp(Frame):
         self._dl._url = self._entry_rss.get()
         self._dl.folder(self._entry_folder.get())
         self._dl.overwrite(self._overwrite.get() == 1)
+        self._dl.prefix_with_datetime(self._prefix.get() == 1)
         self._dl.last_n(0 if self._activate_last_n.get() == 0 else int(self._last_n.get()))
 
     def _switch_action(self, action: bool):
