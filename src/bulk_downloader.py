@@ -42,8 +42,9 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
         logging.error("Failed to reach {}, status is {}".format(url, r.status_code))
         r.close()
         return False
-
-    expected_size = int(r.headers.get("content-length"))
+    expected_size = 0
+    if "content-length" in r.headers.keys():
+        expected_size = int(r.headers.get("content-length"))
     r.close()
 
     if cb and cb.is_cancelled():
@@ -51,13 +52,11 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
 
     chunk_size = 2**20
     last_byte = 0
+    transfer_is_over = False
     with open(path, 'wb') as f:
-        while last_byte < expected_size:
+        while not transfer_is_over:
             if cb and cb.is_cancelled():
                 return False
-            logging.debug("{} vs {}".format(last_byte, expected_size))
-            logging.debug("Starting download with already {}% of the file".
-                          format((100*last_byte)/expected_size))
             resume_header = {'Range': 'bytes=%d-' % last_byte}
             resume_request = requests.get(url, headers=resume_header, stream=True,
                                           verify=True, allow_redirects=True)
@@ -65,9 +64,11 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
                 last_byte += len(data)
                 if cb and cb.is_cancelled():
                     return False
-                if cb:
+                if cb and expected_size > 0:
                     cb.progress(100 * (last_byte / expected_size))
                 f.write(data)
+                if len(data) < chunk_size:
+                    transfer_is_over = True
             resume_request.close()
     if cb and cb.is_cancelled():
         return False
