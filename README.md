@@ -15,6 +15,7 @@ Arguments:
 * `-f FOLDER`, `--folder FOLDER`: Destination folder for MP3 files
 * `--overwrite`: Will overwrite existing files
 * `-l LAST_N`, `--last LAST_N`: Will only download the last N episodes. If N=0, download all the episodes
+* `--prefix_with_datetime`: Will prefix the file name with the date (eg: 2022-06-15)
 * `-v`, `--version`: Print version
 
 Example:
