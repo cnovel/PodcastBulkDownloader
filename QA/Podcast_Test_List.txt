@@ -4,3 +4,5 @@ https://feed.ausha.co/bVOzmcG6wpjm
 https://shows.blueprint.pm/la-cartouche/podcast_la-cartouche.xml
 https://lpotl.libsyn.com/rss
 https://rss.art19.com/the-daily
+https://rss.art19.com/life-is-short-with-justin-long (emojis, test ~5 last episodes)
+http://hobbsnfriends.com/feed/podcast/
