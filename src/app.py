@@ -122,6 +122,7 @@ class PDBApp(Frame):
         initial_dir = cur_dir if os.path.exists(cur_dir) else os.path.expanduser('~')
         directory = filedialog.askdirectory(title='Select directory',
                                             initialdir=initial_dir)
+        directory = os.path.normpath(directory)
         if directory:
             self._entry_folder.delete(0, END)
             self._entry_folder.insert(0, directory)
