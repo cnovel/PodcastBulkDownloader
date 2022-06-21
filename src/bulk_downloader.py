@@ -230,8 +230,7 @@ class BulkDownloader:
         """
         try:
             headers = {'Accept': '*/*',
-                       'User-Agent': 'PodcastBulkDownloader v' + pbd_version,
-                       'Accept-Encoding': 'gzip, deflate, br'}
+                       'User-Agent': 'PodcastBulkDownloader v' + pbd_version}
             r = requests.get(self._url, headers=headers)
         except requests.RequestException as exc:
             err_str = 'Failed to connect to URL ({})'.format(exc)
@@ -336,7 +335,8 @@ class BulkDownloader:
     def _page_is_rss(page):
         try:
             return ElementTree.fromstring(page).tag == 'rss'
-        except ElementTree.ParseError:
+        except ElementTree.ParseError as error:
+            logging.error("Failed to parse XML: {}".format(error))
             return False
 
 
