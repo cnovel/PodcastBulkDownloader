@@ -155,3 +155,7 @@ def test_prefix_enum():
     assert p == bd.Prefix.NO_PREFIX
     with pytest.raises(ValueError):
         bd.Prefix.from_string("WRONG")
+
+
+def test_rss_parse_error():
+    assert not bd.BulkDownloader._page_is_rss("This is not xml".encode('utf-8'))
