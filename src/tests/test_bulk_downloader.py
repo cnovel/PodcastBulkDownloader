@@ -1,3 +1,5 @@
+import datetime
+
 import pytest
 import os
 import sys
@@ -133,14 +135,23 @@ def test_dl_dry_files_exist(tmp_directory):
 
 
 def test_episode():
-    ep1 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK7.mp3', 'Nawak 7',
-                     "2020-10-10")
+    dt = datetime.datetime.utcnow()
+    ep1 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK7.mp3', 'Nawak 7', dt)
     assert ep1.title() == 'Nawak 7'
     assert ep1.title("Nawak 7 avec Yann")
     assert ep1.safe_title() == 'Nawak 7 avec Yann'
     assert ep1.url() == 'https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK7.mp3'
-    assert ep1.get_prefixed_filename() == "2020-10-10 Nawak 7 avec Yann.mp3"
+    assert ep1.get_filename(bd.Prefix.NO_PREFIX) == "Nawak 7 avec Yann.mp3"
+    assert ep1.get_filename(bd.Prefix.DATE) == dt.date().isoformat() + " Nawak 7 avec Yann.mp3"
+    assert ep1.get_filename(bd.Prefix.DATE_TIME) == dt.isoformat('_').replace(':', '-') + " Nawak 7 avec Yann.mp3"
 
     ep2 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK6.mp3',
-                     'Nawak 6 : Qu\'est-ce qu\'on fait demain ?', "2020-10-10_10-10-10")
-    assert ep2.get_filename() == 'Nawak 6 Qu\'est-ce qu\'on fait demain.mp3'
+                     'Nawak 6 : Qu\'est-ce qu\'on fait demain ?', dt)
+    assert ep2.get_filename(bd.Prefix.NO_PREFIX) == 'Nawak 6 Qu\'est-ce qu\'on fait demain.mp3'
+
+
+def test_prefix_enum():
+    p = bd.Prefix.from_string("NO_PREFIX")
+    assert p == bd.Prefix.NO_PREFIX
+    with pytest.raises(ValueError):
+        bd.Prefix.from_string("WRONG")

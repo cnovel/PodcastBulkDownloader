@@ -5,7 +5,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 from threading import Thread
-from src.bulk_downloader import BulkDownloader
+from src.bulk_downloader import BulkDownloader, Prefix
 from src.callback import Callback
 from src import pbd_version
 
@@ -75,9 +75,10 @@ class PDBApp(Frame):
         self._label_episodes = ttk.Label(master, text='episodes')
         self._label_episodes.grid(row=2, column=3, padx=2, sticky=W)
 
-        self._prefix = IntVar()
-        self._cb_prefix = ttk.Checkbutton(master, text='Prefix with date',
-                                          variable=self._prefix, onvalue=1, offvalue=0)
+        self._prefix = StringVar()
+        self._cb_prefix = ttk.Combobox(master, textvariable=self._prefix)
+        self._cb_prefix['values'] = ('No prefix', 'Date prefix', 'Date+Time prefix')
+        self._cb_prefix.current(0)
         self._cb_prefix.grid(row=2, column=4, columnspan=1, sticky=W+E, padx=2, pady=2)
 
         self._btn_fetch = ttk.Button(master, text='Fetch', command=self.fetch)
@@ -137,7 +138,12 @@ class PDBApp(Frame):
         self._dl._url = self._entry_rss.get()
         self._dl.folder(self._entry_folder.get())
         self._dl.overwrite(self._overwrite.get() == 1)
-        self._dl.prefix_with_datetime(self._prefix.get() == 1)
+        prefix = Prefix.NO_PREFIX
+        if self._cb_prefix.current() == 1:
+            prefix = Prefix.DATE
+        if self._cb_prefix.current() == 2:
+            prefix = Prefix.DATE_TIME
+        self._dl.prefix(prefix)
         self._dl.last_n(0 if self._activate_last_n.get() == 0 else int(self._last_n.get()))
 
     def _switch_action(self, action: bool):
