@@ -1,9 +1,11 @@
+import datetime
 import requests
 import os.path
 import logging
 import argparse
 import re
 from pyPodcastParser.Podcast import Podcast
+from enum import Enum
 from src.callback import Callback
 from time import sleep
 from xml.etree import ElementTree
@@ -99,8 +101,27 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> boo
     return False
 
 
+class Prefix(Enum):
+    """
+    Indicate which prefix to use
+    """
+    NO_PREFIX = 1
+    DATE = 2
+    DATE_TIME = 3
+
+    def __str__(self):
+        return self.name
+
+    @staticmethod
+    def from_string(s):
+        try:
+            return Prefix[s]
+        except KeyError:
+            raise ValueError()
+
+
 class Episode:
-    def __init__(self, url: str, title: str, date_time: str):
+    def __init__(self, url: str, title: str, date_time: datetime.datetime):
         """
         Constructor for a podcast episode
         @param url: URL of the MP3 file
@@ -126,14 +147,16 @@ class Episode:
         no_invalid = re.sub(r'[\\/:"*?<>|]+', '', self.title())
         return re.sub(' +', ' ', no_invalid).strip()
 
-    def get_filename(self) -> str:
-        return self.safe_title() + '.mp3'
-
-    def get_date_time(self) -> str:
+    def get_date_time(self) -> datetime.datetime:
         return self._date_time
 
-    def get_prefixed_filename(self) -> str:
-        return self.get_date_time() + ' ' + self.get_filename()
+    def get_filename(self, prefix: Prefix) -> str:
+        filename = self.safe_title() + '.mp3'
+        if prefix == Prefix.DATE:
+            filename = self.get_date_time().date().isoformat() + ' ' + filename
+        elif prefix == Prefix.DATE_TIME:
+            filename = self.get_date_time().isoformat('_').replace(':', '-') + ' ' + filename
+        return filename
 
     def __str__(self) -> str:
         return 'Episode "{}" ({})'.format(self.title(), self.url())
@@ -143,20 +166,20 @@ class BulkDownloader:
     _EXT = '.mp3'
 
     def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True,
-                 prefix_with_datetime: bool = False):
+                 prefix: Prefix = Prefix.NO_PREFIX):
         """
         Constructor of the bulkdownloader
         @param url: URL of the RSS feed or web directory
         @param folder: Folder where to save the MP3s
         @param last_n: Only download the last N episodes, all if N = 0
         @param overwrite: Overwrite already downloaded files
-        @param prefix_with_datetime: Add datetime for each file name
+        @param prefix: Prefix added for each file name
         """
         self._url = url
         self._folder = folder
         self._last_n = last_n
         self._overwrite = overwrite
-        self._prefix = prefix_with_datetime
+        self._prefix = prefix
 
     def last_n(self, n: int = None):
         """
@@ -178,7 +201,7 @@ class BulkDownloader:
             self._overwrite = overwrite
         return self._overwrite
 
-    def prefix_with_datetime(self, prefix: bool = None) -> bool:
+    def prefix(self, prefix: Prefix = None) -> Prefix:
         """
         Set and return the prefix with datetime parameter
         @param prefix: New prefix value
@@ -268,20 +291,19 @@ class BulkDownloader:
                 cb.progress(count * step)
 
             # Getting the name and path
-            name = episode.get_prefixed_filename() if self.prefix_with_datetime() else episode.get_filename()
+            name = episode.get_filename(self.prefix())
             path = os.path.join(self.folder(), name)
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
                 logging.info('Skipping {} as the file already exists at {}'
-                             .format(episode.get_filename(), path))
+                             .format(name, path))
                 downloads_skipped += 1
                 count += 1
                 continue
 
             # Download file
-            logging.info('Saving {} to {} from {}'.format(episode.get_filename(), path,
-                                                          episode.url()))
+            logging.info('Saving {} to {} from {}'.format(name, path, episode.url()))
             if cb:
                 cb.set_function(lambda x: (count + x / 100) * step)
             if not dry_run and try_download(episode.url(), path, cb=cb):
@@ -305,8 +327,9 @@ class BulkDownloader:
         episodes = []
         pod_feed = Podcast(page)
         for item in pod_feed.items:
-            episodes.append(Episode(item.enclosure_url, item.title,
-                                    item.date_time.date().isoformat().replace(':', '-')))
+            pub_date_time = datetime.datetime.utcfromtimestamp(item.time_published) \
+                if item.time_published > 0 else item.published_date
+            episodes.append(Episode(item.enclosure_url, item.title, pub_date_time))
         return episodes
 
     @staticmethod
@@ -317,21 +340,21 @@ class BulkDownloader:
             return False
 
 
-def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, prefix_with_datetime: bool = False):
+def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, prefix: Prefix = Prefix.NO_PREFIX):
     """
     Will create a BulkDownloader and download all the mp3s from an URL to the folder
     @param url: Directory/RSS url
     @param folder: Where to save the MP3s
     @param last_n: Only download the last N episodes, all if N = 0
     @param overwrite: Overwrite existing files
-    @param prefix_with_datetime: Add publication date time for each file
+    @param prefix: Prefix type for each file
     """
     logging.info('Downloading mp3s from {} to {}'.format(url, folder))
     if overwrite:
         logging.info('Already existing file will be overwritten')
     else:
         logging.info('Already existing file won\'t be overwritten')
-    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite, prefix_with_datetime)
+    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite, prefix)
     bulk_downloader.download_mp3()
 
 
@@ -359,8 +382,8 @@ def main() -> int:
                         help='Print version')
     parser.add_argument('-l', '--last', dest='last_n', default=0,
                         help='Only download the last N episodes, if N=0, download all the episodes')
-    parser.add_argument('--prefix_with_datetime', dest='prefix', action='store_true',
-                        help='Will prefix file names with publication datetime')
+    parser.add_argument('--prefix', dest='prefix', type=Prefix.from_string, choices=list(Prefix),
+                        default=Prefix.NO_PREFIX, help='Prefix for the filename')
     args = parser.parse_args()
 
     if args.version:
