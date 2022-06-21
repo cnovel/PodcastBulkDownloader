@@ -148,3 +148,10 @@ def test_episode():
     ep2 = bd.Episode('https://www.podtrac.com/pts/redirect.mp3/dl.radiokawa.com/nawak/NAWAK6.mp3',
                      'Nawak 6 : Qu\'est-ce qu\'on fait demain ?', dt)
     assert ep2.get_filename(bd.Prefix.NO_PREFIX) == 'Nawak 6 Qu\'est-ce qu\'on fait demain.mp3'
+
+
+def test_prefix_enum():
+    p = bd.Prefix.from_string("NO_PREFIX")
+    assert p == bd.Prefix.NO_PREFIX
+    with pytest.raises(ValueError):
+        bd.Prefix.from_string("WRONG")
