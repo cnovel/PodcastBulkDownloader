@@ -291,7 +291,7 @@ class BulkDownloader:
 
             # Getting the name and path
             name = episode.get_filename(self.prefix())
-            path = os.path.join(self.folder(), name)
+            path = os.path.normpath(os.path.join(self.folder(), name))
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
