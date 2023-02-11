@@ -228,8 +228,9 @@ class BulkDownloader:
             self._folder = folder
         return self._folder
 
-
     def _is_url(self):
+        if self._url.startswith('https://') or self._url.startswith('http://'):
+            return True
         try:
             urlopen(self._url)
             return True
