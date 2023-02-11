@@ -11,11 +11,11 @@ Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite] [-l L
 
 Arguments:
 * `-h`, `--help`: shows this help message and exit
-* `--url URL`: URL to inspect for MP3s
+* `--url URL`: URL to inspect for MP3s, local path file is also supported
 * `-f FOLDER`, `--folder FOLDER`: Destination folder for MP3 files
 * `--overwrite`: Will overwrite existing files
 * `-l LAST_N`, `--last LAST_N`: Will only download the last N episodes. If N=0, download all the episodes
-* `--prefix_with_datetime`: Will prefix the file name with the date (eg: 2022-06-15)
+* `--prefix [NO_PREFIX, DATE, DATE_TIME]`: Optional, choose is you want to prefix with date or date_time
 * `-v`, `--version`: Print version
 
 Example:
