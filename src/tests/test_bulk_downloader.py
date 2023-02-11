@@ -159,3 +159,25 @@ def test_prefix_enum():
 
 def test_rss_parse_error():
     assert not bd.BulkDownloader._page_is_rss("This is not xml".encode('utf-8'))
+
+
+def test_long_name(tmp_directory):
+    long_dir = (238 - len(tmp_directory)) * "a"
+    long_dir = os.path.join(tmp_directory, long_dir)
+    os.mkdir(long_dir)
+    bdl = bd.BulkDownloader("https://feed.pippa.io/public/shows/5c84098aab4c3efd34fbc464", long_dir, 1)
+    bdl.download_mp3()
+    files = [f for f in os.listdir(long_dir)]
+    assert len(files) == 1
+    print(files[0])
+    assert files[0].endswith(".mp3")
+
+
+def test_too_long_out_folder(tmp_directory):
+    long_dir = (250 - len(tmp_directory)) * "a"
+    long_dir = os.path.join(tmp_directory, long_dir)
+    os.mkdir(long_dir)
+    print("Trying to download to " + long_dir)
+    bdl = bd.BulkDownloader("https://feed.pippa.io/public/shows/5c84098aab4c3efd34fbc464", long_dir, 1)
+    with pytest.raises(bd.BulkDownloaderException):
+        bdl.download_mp3()
