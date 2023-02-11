@@ -188,3 +188,17 @@ def test_local_file(tmp_directory):
     local_file = os.path.join(TEST_DATA, "podcast_tech-two.xml")
     bdl = bd.BulkDownloader(local_file, tmp_directory)
     assert len(bdl.list_mp3()) == 1
+
+
+def test_local_file_not_rss(tmp_directory):
+    local_file = os.path.join(TEST_DATA, "not_rss.txt")
+    bdl = bd.BulkDownloader(local_file, tmp_directory)
+    with pytest.raises(bd.BulkDownloaderException):
+        bdl.download_mp3()
+
+
+def test_local_file_not_found(tmp_directory):
+    local_file = os.path.join(TEST_DATA, "unknw.xml")
+    bdl = bd.BulkDownloader(local_file, tmp_directory)
+    with pytest.raises(bd.BulkDownloaderException):
+        bdl.download_mp3()
