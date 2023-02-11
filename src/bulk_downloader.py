@@ -90,15 +90,19 @@ def try_download(url, path, max_try=3, sleep_time=5, cb: Callback = None) -> boo
     @return: True if the file was completely downloaded
     """
     count = 0
-    while count < max_try:
-        if download_with_resume(url, path, cb):
-            return True
-        if cb and cb.is_cancelled():
-            return False
-        count += 1
-        sleep(sleep_time)
-    logging.error('Download of {} failed after {} tries'.format(url, max_try))
-    return False
+    try:
+        while count < max_try:
+            if download_with_resume(url, path, cb):
+                return True
+            if cb and cb.is_cancelled():
+                return False
+            count += 1
+            sleep(sleep_time)
+        logging.error('Download of {} failed after {} tries'.format(url, max_try))
+        return False
+    except Exception as exc:
+        logging.error('Download of {} crashed: {}'.format(url, max_try, exc))
+        return False
 
 
 class Prefix(Enum):
@@ -272,6 +276,12 @@ class BulkDownloader:
             err_str = 'No folder is defined for the download'
             logging.error(err_str)
             raise BulkDownloaderException(err_str)
+
+        if len(self.folder()) > 240:
+            err_str = 'Folder name is too long, please chose a shorter folder name'
+            logging.error(err_str)
+            raise BulkDownloaderException(err_str)
+
         to_download = self.list_mp3(cb)
         logging.info('{} files will be downloaded'.format(len(to_download)))
         if cb and cb.is_cancelled():
@@ -292,6 +302,10 @@ class BulkDownloader:
             # Getting the name and path
             name = episode.get_filename(self.prefix())
             path = os.path.normpath(os.path.join(self.folder(), name))
+            if len(path) >= 260:
+                short_path = path[:-3][0:256] + ".mp3"
+                logging.warning(f"{path} is too long shortening to {short_path}")
+                path = short_path
 
             # Check if we should skip the file
             if not self.overwrite() and os.path.isfile(path):
