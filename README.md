@@ -24,7 +24,7 @@ PodcastBulkDownloaderCLI.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://f
 ```
 
 ### GUI Version
-![PBD_GUI](img/PBD_GUI_v0.5.png)
+![PBD_GUI](img/PBD_GUI_v0.8.png)
 
 It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed.
 Then fill the Folder field and click download to download the episodes.
