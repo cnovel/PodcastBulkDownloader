@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0" xmlns:googleplay="http://www.google.com/schemas/play-podcasts/1.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://www.rssboard.org/media-rss">
+<channel>
+  <title>Tech Two</title> 
+  <itunes:author>Blueprint</itunes:author>
+  <itunes:owner><itunes:email>podcast@blueprint.pm</itunes:email></itunes:owner>
+  <itunes:category text="Technology"></itunes:category>  
+  <link>https://www.blueprint.pm/podcasts/tech-two/</link> 
+  <itunes:summary>Le podcast qui vous aide à tirer le meilleur de la technologie, au travail comme à la maison ! Avec Yann Rieder et Franck Extanasié.</itunes:summary>
+    <description>Le podcast qui vous aide à tirer le meilleur de la technologie, au travail comme à la maison ! Avec Yann Rieder et Franck Extanasié.</description>
+  <itunes:type>episodic</itunes:type>
+  <language>fr-fr</language> 
+  <lastBuildDate>Fri, 27 Jan 2023 08:00:00 +0200</lastBuildDate> 
+  <copyright>Blueprint © 2017-2023. Tous droits réservés.</copyright> 
+  <image>
+	<url>https://shows.blueprint.pm/tech-two/TechTwo.jpg</url> 
+	<title>Tech Two</title> 
+	<link>https://www.blueprint.pm/podcasts/tech-two/</link> 
+  </image>
+	<itunes:image href="https://shows.blueprint.pm/tech-two/TechTwo.jpg" />
+	<itunes:explicit>no</itunes:explicit>
+	<item>
+		<title><![CDATA[L’économie de l’attention et les nouveautés du CES 2023]]></title>
+		<link>https://www.blueprint.pm/tech-two-89/</link> 
+		<itunes:author>Blueprint</itunes:author>
+		<enclosure url="https://www.podtrac.com/pts/redirect.mp3/shows.blueprint.pm/tech-two/TT89.mp3" type="audio/mpeg" />
+		<guid isPermaLink="false">https://shows.blueprint.pm/tech-two/TT89.mp3</guid>
+		<pubDate>Fri, 27 Jan 2023 08:00:00 +0200</pubDate>
+		<itunes:episode>89</itunes:episode>
+		<itunes:episodeType>full</itunes:episodeType>
+		<itunes:duration>4:05:46</itunes:duration>
+		<itunes:image href="https://shows.blueprint.pm/tech-two/TechTwo.jpg" />
+		<itunes:subtitle><![CDATA[Franck reçoit Nico_Oni, journaliste et ancien de Tom’s Guide et Canard PC Hardware, pour faire le point sur les nouveautés du CES 2023. Pendant que Yann peaufine une chronique sur l’économie de l’attention.]]></itunes:subtitle>
+		<description><![CDATA[Franck reçoit Nico_Oni, journaliste et ancien de Tom’s Guide et Canard PC Hardware, pour faire le point sur les nouveautés du CES 2023. Pendant que Yann peaufine une chronique sur l’économie de l’attention.]]></description>
+		<content:encoded><![CDATA[Petit changement de formule pour ce 89e numéro de Tech Two : Franck accueille dans le studio de Tech Two, <a href="https://t.co/0SwUsAmZWv">Nico_Oni</a>, journaliste et ancien de Tom’s Guide et Canard PC Hardware pour un (long) dossier sur les nouveautés du CES 2023, le salon des nouvelles technologies de Los Angeles, qui s’est tenu en début d’année. Pendant ce temps, Yann n’est pas loin et propose une chronique autour de l’économie de l’attention. Et cette fois, ce sont Franck et Nico qui répondent à vos remarques et questions. <h3>Dans l'after-show...</h3>Franck et Nico reviennent longuement sur les dernières tribulations d’Elon Musk et de ses frasques sur Twitter et en dehors. Au risque de mettre en danger de nombreuses personnes.<h3>Informations complémentaires</h3><strong>Faites-nous vos retours :</strong><ul> 	<li>Par e-mail : <a href="mailto:techtwo@blueprint.pm">techtwo@blueprint.pm</a></li> 	<li>Par Twitter : @<a href="https://twitter.com/techtwobp">TechTwoBP</a></li></ul><strong>Liens et infos :</strong><ul> 	<li><a href="https://www.apple.com/fr/shop/buy-mac/mac-mini">Mac Mini M2 et M2 Pro</a></li> 	<li><a href="https://www.apple.com/fr/macbook-pro/">MacBook Pro 14” et 16”</a></li> 	<li><a href="https://rog.asus.com/networking/rog-rapture-gt-be98-model/">WiFi 7 chez Asus</a></li> 	<li><a href="https://www.corsair.com/fr/fr/Cat%C3%A9gories/Produits/%C3%89crans/CORSAIR-XENEON-FLEX-45WQHD240-Gaming-Monitor/p/CM-9030001-PE">Écran Corsair 45 incurvable</a></li> 	<li><a href="https://youtu.be/wCl33v5969M">The Cost of Doing Business, sur YouTube</a></li></ul><em>Ce podcast a été enregistré le 18 janvier 2023.</em>]]></content:encoded>
+	</item>
+</channel>
+</rss>

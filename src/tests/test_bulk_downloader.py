@@ -8,6 +8,7 @@ from src import bulk_downloader as bd
 from src.callback import Callback
 from unittest.mock import patch
 
+TEST_DATA = os.path.join(os.path.dirname(os.path.realpath(__file__)), "data")
 
 def test_constructor():
     bdl = bd.BulkDownloader('https://feeds.radiokawa.com/podcast_nawak.xml', './dl', 0, False)
@@ -181,3 +182,9 @@ def test_too_long_out_folder(tmp_directory):
     bdl = bd.BulkDownloader("https://feed.pippa.io/public/shows/5c84098aab4c3efd34fbc464", long_dir, 1)
     with pytest.raises(bd.BulkDownloaderException):
         bdl.download_mp3()
+
+
+def test_local_file(tmp_directory):
+    local_file = os.path.join(TEST_DATA, "podcast_tech-two.xml")
+    bdl = bd.BulkDownloader(local_file, tmp_directory)
+    assert len(bdl.list_mp3()) == 1
