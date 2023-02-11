@@ -233,8 +233,8 @@ class BulkDownloader:
         try:
             urlopen(self._url)
             return True
-        except URLError:
-            return False
+        except URLError as url_error:
+            return hasattr(url_error, 'code')
 
     def list_mp3(self, cb: Callback = None, verbose: bool = False) -> List[Episode]:
         """
