@@ -11,11 +11,11 @@ Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite] [-l L
 
 Arguments:
 * `-h`, `--help`: shows this help message and exit
-* `--url URL`: URL to inspect for MP3s
+* `--url URL`: URL to inspect for MP3s, local path file is also supported
 * `-f FOLDER`, `--folder FOLDER`: Destination folder for MP3 files
 * `--overwrite`: Will overwrite existing files
 * `-l LAST_N`, `--last LAST_N`: Will only download the last N episodes. If N=0, download all the episodes
-* `--prefix_with_datetime`: Will prefix the file name with the date (eg: 2022-06-15)
+* `--prefix [NO_PREFIX, DATE, DATE_TIME]`: Optional, choose is you want to prefix with date or date_time
 * `-v`, `--version`: Print version
 
 Example:
@@ -24,7 +24,7 @@ PodcastBulkDownloaderCLI.exe -f "G:\Musique\RadioKawa\Ta Gueule" --url https://f
 ```
 
 ### GUI Version
-![PBD_GUI](img/PBD_GUI_v0.5.png)
+![PBD_GUI](img/PBD_GUI_v0.8.png)
 
 It's fairly easy to use: fill the RSS field, click Fetch to inspect the feed.
 Then fill the Folder field and click download to download the episodes.

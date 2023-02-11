@@ -4,6 +4,9 @@ import os.path
 import logging
 import argparse
 import re
+from urllib.request import urlopen
+from urllib.error import URLError
+
 from pyPodcastParser.Podcast import Podcast
 from enum import Enum
 from src.callback import Callback
@@ -225,6 +228,15 @@ class BulkDownloader:
             self._folder = folder
         return self._folder
 
+    def _is_url(self):
+        if self._url.startswith('https://') or self._url.startswith('http://'):
+            return True
+        try:
+            urlopen(self._url)
+            return True
+        except URLError as url_error:
+            return hasattr(url_error, 'code')
+
     def list_mp3(self, cb: Callback = None, verbose: bool = False) -> List[Episode]:
         """
         Will fetch the RSS or directory info and return the list of available MP3s
@@ -232,19 +244,29 @@ class BulkDownloader:
         @param verbose: Outputs more logs
         @return: List of MP3 urls
         """
-        try:
-            headers = {'Accept': '*/*',
-                       'User-Agent': 'PodcastBulkDownloader v' + pbd_version}
-            r = requests.get(self._url, headers=headers)
-        except requests.RequestException as exc:
-            err_str = 'Failed to connect to URL ({})'.format(exc)
-            logging.error(err_str)
-            raise BulkDownloaderException(err_str)
-        if r.status_code != 200:
-            err_str = 'Failed to access URL (code {})'.format(r.status_code)
-            logging.error(err_str)
-            raise BulkDownloaderException(err_str)
-        page = r.content
+        if self._is_url():
+            try:
+                headers = {'Accept': '*/*',
+                           'User-Agent': 'PodcastBulkDownloader v' + pbd_version}
+                r = requests.get(self._url, headers=headers)
+            except requests.RequestException as exc:
+                err_str = 'Failed to connect to URL ({})'.format(exc)
+                logging.error(err_str)
+                raise BulkDownloaderException(err_str)
+            if r.status_code != 200:
+                err_str = 'Failed to access URL (code {})'.format(r.status_code)
+                logging.error(err_str)
+                raise BulkDownloaderException(err_str)
+            page = r.content
+        else:
+            try:
+                with open(self._url, 'rb') as rss_file:
+                    page = rss_file.read()
+            except Exception as exc:
+                err_str = 'Failed to read rss file ({})'.format(exc)
+                logging.error(err_str)
+                raise BulkDownloaderException(err_str)
+
         if cb and cb.is_cancelled():
             return []
         if self._page_is_rss(page):
