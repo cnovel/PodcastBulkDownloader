@@ -14,6 +14,13 @@ from time import sleep
 from xml.etree import ElementTree
 from typing import List
 from src import pbd_version
+from urllib.parse import urlparse
+from os.path import splitext
+
+KNOWN_AUDIO_FORMATS = [  # Main ones from Wikipedia "Audio file format"
+    ".3gp", ".aac", ".aiff", ".flac", ".m4a", ".mp3", ".ogg",
+    ".oga", ".mogg", ".opus", ".wav", ".wma", ".webm"
+]
 
 
 class BulkDownloaderException(Exception):
@@ -157,8 +164,16 @@ class Episode:
     def get_date_time(self) -> datetime.datetime:
         return self._date_time
 
+    def get_ext(self) -> str:
+        parsed = urlparse(self.url())
+        _, ext = splitext(parsed.path)
+        if ext not in KNOWN_AUDIO_FORMATS:
+            logging.warning("Can't find extension for audio file, defaulting to mp3")
+            ext = ".mp3"
+        return ext
+
     def get_filename(self, prefix: Prefix) -> str:
-        filename = self.safe_title() + '.mp3'
+        filename = self.safe_title() + self.get_ext()
         if prefix == Prefix.DATE:
             filename = self.get_date_time().date().isoformat() + ' ' + filename
         elif prefix == Prefix.DATE_TIME:
@@ -170,8 +185,6 @@ class Episode:
 
 
 class BulkDownloader:
-    _EXT = '.mp3'
-
     def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True,
                  prefix: Prefix = Prefix.NO_PREFIX):
         """
