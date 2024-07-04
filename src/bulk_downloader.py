@@ -168,7 +168,8 @@ class Episode:
         parsed = urlparse(self.url())
         _, ext = splitext(parsed.path)
         if ext not in KNOWN_AUDIO_FORMATS:
-            logging.warning("Can't find extension for audio file, defaulting to mp3")
+            logging.warning("Can't find extension for audio file, "
+                            "defaulting to mp3")
             ext = ".mp3"
         return ext
 
