@@ -262,7 +262,8 @@ class BulkDownloader:
         if self._is_url():
             try:
                 headers = {'Accept': '*/*',
-                           'User-Agent': f'PodcastBulkDownloader/{pbd_version}' }
+                           'User-Agent':
+                               f'PodcastBulkDownloader/{pbd_version}'}
                 r = requests.get(self._url, headers=headers)
             except requests.RequestException as exc:
                 err_str = 'Failed to connect to URL ({})'.format(exc)
