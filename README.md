@@ -5,6 +5,8 @@
 
 **Podcast Bulk Downloader** is a simple soft that allows you to download all the episodes of a podcast feed in a folder.
 
+⚠️ Several antivirus providers flag Podcast Bulk Downloader as a trojan ([see this issue](https://github.com/cnovel/PodcastBulkDownloader/issues/77)). The issue is being investigated but in the meantime, please flag the exe as false positive to your AV provider. It will greatly help me!
+
 ## How to use Podcast Bulk Downloader
 ### CLI version
 Usage: `PodcastBulkDownloaderCLI.exe -f FOLDER --url RSS_URL [--overwrite] [-l LAST_N]`
