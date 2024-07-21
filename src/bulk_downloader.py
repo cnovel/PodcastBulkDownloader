@@ -43,9 +43,10 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
 
     if cb and cb.is_cancelled():
         return False
-
+    s = requests.Session()
+    s.headers["User-Agent"] = f"PodcastBulkDownloader/{pbd_version}"
     try:
-        r = requests.head(url, allow_redirects=True)
+        r = s.head(url, allow_redirects=True)
     except requests.exceptions as e:
         logging.error(e)
         return False
@@ -70,8 +71,8 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
             if cb and cb.is_cancelled():
                 return False
             resume_header = {'Range': 'bytes=%d-' % last_byte}
-            resume_request = requests.get(url, headers=resume_header, stream=True,
-                                          verify=True, allow_redirects=True)
+            resume_request = s.get(url, headers=resume_header, stream=True,
+                                   verify=True, allow_redirects=True)
             for data in resume_request.iter_content(chunk_size):
                 last_byte += len(data)
                 if cb and cb.is_cancelled():
@@ -261,7 +262,8 @@ class BulkDownloader:
         if self._is_url():
             try:
                 headers = {'Accept': '*/*',
-                           'User-Agent': 'PodcastBulkDownloader v' + pbd_version}
+                           'User-Agent':
+                               f'PodcastBulkDownloader/{pbd_version}'}
                 r = requests.get(self._url, headers=headers)
             except requests.RequestException as exc:
                 err_str = 'Failed to connect to URL ({})'.format(exc)
