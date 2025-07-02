@@ -1,7 +1,7 @@
 ![PBD_Logo](img/pdb_logo_small.png)
 
 # Podcast Bulk Downloader
-![example workflow](https://github.com/cnovel/PodcastBulkDownloader/actions/workflows/python-app.yml/badge.svg) [![codecov](https://codecov.io/gh/cnovel/PodcastBulkDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/cnovel/PodcastBulkDownloader) ![version](https://img.shields.io/badge/Python-3.7%20%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
+![example workflow](https://github.com/cnovel/PodcastBulkDownloader/actions/workflows/python-app.yml/badge.svg) [![codecov](https://codecov.io/gh/cnovel/PodcastBulkDownloader/branch/master/graph/badge.svg)](https://codecov.io/gh/cnovel/PodcastBulkDownloader) ![version](https://img.shields.io/badge/Python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
 
 **Podcast Bulk Downloader** is a simple soft that allows you to download all the episodes of a podcast feed in a folder.
 

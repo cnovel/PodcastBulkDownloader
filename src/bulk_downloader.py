@@ -4,6 +4,7 @@ import os.path
 import logging
 import argparse
 import re
+import random
 from urllib.request import urlopen
 from urllib.error import URLError
 
@@ -25,6 +26,10 @@ KNOWN_AUDIO_FORMATS = [  # Main ones from Wikipedia "Audio file format"
 
 class BulkDownloaderException(Exception):
     pass
+
+def shitty_hoster_url(url) -> bool:
+    shitty_hosters = ["acast.com"]
+    return any(x in url for x in shitty_hosters)
 
 
 def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
@@ -59,7 +64,11 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
     if "content-length" in r.headers.keys():
         expected_size = int(r.headers.get("content-length"))
     r.close()
-
+    if expected_size < 10:
+        logging.warning("This provider is lying on the content size. Progress will be approximate.")
+        expected_size = 100000000
+    if shitty_hoster_url(url):
+        sleep(random.uniform(0.5, 1.5))
     if cb and cb.is_cancelled():
         return False
 
@@ -78,7 +87,7 @@ def download_with_resume(url: str, path: str, cb: Callback = None) -> bool:
                 if cb and cb.is_cancelled():
                     return False
                 if cb and expected_size > 0:
-                    cb.progress(100 * (last_byte / expected_size))
+                    cb.progress(min(100 * (last_byte / expected_size), 100))
                 f.write(data)
                 if len(data) < chunk_size:
                     transfer_is_over = True
