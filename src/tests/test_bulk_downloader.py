@@ -166,7 +166,7 @@ def test_long_name(tmp_directory):
     long_dir = (238 - len(tmp_directory)) * "a"
     long_dir = os.path.join(tmp_directory, long_dir)
     os.mkdir(long_dir)
-    bdl = bd.BulkDownloader("https://feed.pippa.io/public/shows/5c84098aab4c3efd34fbc464", long_dir, 1)
+    bdl = bd.BulkDownloader("https://shows.blueprint.pm/la-cartouche/podcast_la-cartouche.xml", long_dir, 1)
     bdl.download_mp3()
     files = [f for f in os.listdir(long_dir)]
     assert len(files) == 1
@@ -179,7 +179,7 @@ def test_too_long_out_folder(tmp_directory):
     long_dir = os.path.join(tmp_directory, long_dir)
     os.mkdir(long_dir)
     print("Trying to download to " + long_dir)
-    bdl = bd.BulkDownloader("https://feed.pippa.io/public/shows/5c84098aab4c3efd34fbc464", long_dir, 1)
+    bdl = bd.BulkDownloader("https://shows.blueprint.pm/la-cartouche/podcast_la-cartouche.xml", long_dir, 1)
     with pytest.raises(bd.BulkDownloaderException):
         bdl.download_mp3()
 
