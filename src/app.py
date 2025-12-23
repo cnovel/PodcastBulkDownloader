@@ -63,23 +63,29 @@ class PDBApp(Frame):
                                              variable=self._overwrite, onvalue=1, offvalue=0)
         self._cb_overwrite.grid(row=2, column=0, columnspan=1, sticky=W+E, padx=2, pady=2)
 
+        self.reverse = BooleanVar()
+        self._cb_reverse = ttk.Checkbutton(master, text='Oldest First',
+                                           variable=self.reverse, onvalue=True, offvalue=False)
+        self._cb_reverse.grid(row=2, column=1, columnspan=1, sticky=W+E, padx=2, pady=2)
+        self.reverse.trace_add('write', self._on_reverse_toggle)
+
         self._activate_last_n = IntVar()
         self._cb_activate_last_n = ttk.Checkbutton(master, text='Download only last ',
                                                    variable=self._activate_last_n, onvalue=1, offvalue=0,
                                                    command=self._toggle_last_n)
-        self._cb_activate_last_n.grid(row=2, column=1, columnspan=1, sticky=W+E, padx=2, pady=2)
+        self._cb_activate_last_n.grid(row=2, column=2, columnspan=1, sticky=W+E, padx=2, pady=2) 
         self._last_n = StringVar(value="1")
         self._sb_last_n = ttk.Spinbox(master, from_=1, to=50000, textvariable=self._last_n)
         self._sb_last_n.configure(state=DISABLED)
-        self._sb_last_n.grid(row=2, column=2, sticky=W+E, padx=2, pady=2)
+        self._sb_last_n.grid(row=2, column=3, sticky=W+E, padx=2, pady=2)
         self._label_episodes = ttk.Label(master, text='episodes')
-        self._label_episodes.grid(row=2, column=3, padx=2, sticky=W)
+        self._label_episodes.grid(row=2, column=4, padx=2, sticky=W)
 
         self._prefix = StringVar()
         self._cb_prefix = ttk.Combobox(master, textvariable=self._prefix)
         self._cb_prefix['values'] = ('No prefix', 'Date prefix', 'Date+Time prefix')
         self._cb_prefix.current(0)
-        self._cb_prefix.grid(row=2, column=4, columnspan=1, sticky=W+E, padx=2, pady=2)
+        self._cb_prefix.grid(row=2, column=5, columnspan=1, sticky=W+E, padx=2, pady=2)
 
         self._btn_fetch = ttk.Button(master, text='Fetch', command=self.fetch)
         self._btn_fetch.grid(row=2, column=7, columnspan=1, sticky=W+E, padx=2, pady=2)
@@ -134,6 +140,15 @@ class PDBApp(Frame):
         except TclError as exc:
             logging.warning('Can\'t clean text ({})'.format(exc))
 
+    def _on_reverse_toggle(self, *args):
+        try:
+            if self.reverse.get():
+                self._cb_activate_last_n.configure(text='Download only first ')
+            else:
+                self._cb_activate_last_n.configure(text='Download only last ')
+        except Exception:
+            pass
+
     def _update_dl_with_fields(self):
         self._dl._url = self._entry_rss.get()
         self._dl.folder(self._entry_folder.get())
@@ -144,6 +159,7 @@ class PDBApp(Frame):
         if self._cb_prefix.current() == 2:
             prefix = Prefix.DATE_TIME
         self._dl.prefix(prefix)
+        self._dl._reverse = bool(self.reverse.get())
         self._dl.last_n(0 if self._activate_last_n.get() == 0 else int(self._last_n.get()))
 
     def _switch_action(self, action: bool):
