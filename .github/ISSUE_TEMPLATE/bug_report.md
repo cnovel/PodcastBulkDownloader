@@ -24,7 +24,9 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **System Information:**
-Windows 10 for example
+OS version (for example: macOS 26.2, Windows 11, Ubuntu 24.04)
+Python version (`python --version`)
+Install method (for example: `pip install .`, executable, etc.)
 
 **Additional context**
 Add any other context about the problem here.
