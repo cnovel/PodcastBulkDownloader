@@ -197,7 +197,7 @@ class Episode:
 
 class BulkDownloader:
     def __init__(self, url: str, folder: str = None, last_n: int = 0, overwrite: bool = True,
-                 prefix: Prefix = Prefix.NO_PREFIX):
+                 prefix: Prefix = Prefix.NO_PREFIX, reverse: bool = False):
         """
         Constructor of the bulkdownloader
         @param url: URL of the RSS feed or web directory
@@ -205,12 +205,14 @@ class BulkDownloader:
         @param last_n: Only download the last N episodes, all if N = 0
         @param overwrite: Overwrite already downloaded files
         @param prefix: Prefix added for each file name
+        @param reverse: Download episodes in reverse order
         """
         self._url = url
         self._folder = folder
         self._last_n = last_n
         self._overwrite = overwrite
         self._prefix = prefix
+        self._reverse = reverse
 
     def last_n(self, n: int = None):
         """
@@ -297,6 +299,10 @@ class BulkDownloader:
         if self._page_is_rss(page):
             logging.info('Processing RSS document')
             to_download = self._get_episodes_to_download_from_rss(page)
+            
+            if self._reverse:
+                to_download.reverse()
+            
             # We trim the list if needed
             if 0 < self._last_n < len(to_download):
                 to_download = to_download[0:self._last_n]
@@ -401,7 +407,7 @@ class BulkDownloader:
             return False
 
 
-def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, prefix: Prefix = Prefix.NO_PREFIX):
+def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, prefix: Prefix = Prefix.NO_PREFIX, reverse: bool = False):
     """
     Will create a BulkDownloader and download all the mp3s from an URL to the folder
     @param url: Directory/RSS url
@@ -409,13 +415,14 @@ def download_mp3s(url: str, folder: str, last_n: int, overwrite: bool = True, pr
     @param last_n: Only download the last N episodes, all if N = 0
     @param overwrite: Overwrite existing files
     @param prefix: Prefix type for each file
+    @param reverse: Download episodes in reverse order
     """
     logging.info('Downloading mp3s from {} to {}'.format(url, folder))
     if overwrite:
         logging.info('Already existing file will be overwritten')
     else:
         logging.info('Already existing file won\'t be overwritten')
-    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite, prefix)
+    bulk_downloader = BulkDownloader(url, folder, last_n, overwrite, prefix, reverse)
     bulk_downloader.download_mp3()
 
 
@@ -445,6 +452,8 @@ def main() -> int:
                         help='Only download the last N episodes, if N=0, download all the episodes')
     parser.add_argument('--prefix', dest='prefix', type=Prefix.from_string, choices=list(Prefix),
                         default=Prefix.NO_PREFIX, help='Prefix for the filename')
+    parser.add_argument('-r','--reverse', dest='reverse', action='store_true',
+                        help='Download episodes in reverse order')
     args = parser.parse_args()
 
     if args.version:
@@ -455,7 +464,7 @@ def main() -> int:
         return 1
 
     try:
-        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite, args.prefix)
+        download_mp3s(args.url, args.folder, int(args.last_n), args.overwrite, args.prefix, args.reverse)
     except Exception as exc:
         logging.error(exc)
         return 1
